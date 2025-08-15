@@ -7,8 +7,8 @@ import Lotofacil from './models/Lotofacil.js'; // Seu modelo de concurso
 
 dotenv.config(); // Carrega as variáveis do .env
 
-// Use a mesma string de conexão do seu script de sincronização
-const MONGO_URI = "mongodb+srv://robertosantosloteria:cchzSvHgUzLHecmO@cluster0.fuyxwq1.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0";
+// A forma CORRETA de ler a string de conexão do ambiente de produção
+const MONGO_URI = process.env.MONGO_URI;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
