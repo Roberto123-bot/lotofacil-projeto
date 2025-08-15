@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Lotofácil</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Análise de Frequência - Lotofácil</h1>
+        <p>Tabela com as dezenas mais sorteadas de todos os concursos.</p>
+    </header>
+
+    <main>
+        <div id="loading">Carregando dados...</div>
+        <table id="frequencia-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Posição</th>
+                    <th>Dezena</th>
+                    <th>Total de Sorteios</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+
+        <hr>
+        <h1>Tabela de Movimentação</h1>
+        <div class="botoes-container">
+            <button class="btn-movimentacao" data-quantidade="10">10 Concursos</button>
+            <button class="btn-movimentacao" data-quantidade="20">20 Concursos</button>
+            <button class="btn-movimentacao" data-quantidade="30">30 Concursos</button>
+        </div>
+        <div id="movimentacao-loading" class="loading" style="display:none;">Carregando tabela...</div>
+        <table id="movimentacao-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Concurso</th>
+                    </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

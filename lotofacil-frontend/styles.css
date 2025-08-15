@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: #4CAF50;
+}
+
+#loading {
+    text-align: center;
+    font-size: 1.2em;
+    color: #555;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+td:first-child {
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Restante do seu CSS já existente... */
+
+.botoes-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.btn-movimentacao {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-movimentacao:hover {
+    background-color: #45a049;
+}
+
+#movimentacao-table th, #movimentacao-table td {
+    padding: 8px 5px;
+    text-align: center;
+}
+
+#movimentacao-table th:first-child, #movimentacao-table td:first-child {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+/* Estilo para as dezenas sorteadas */
+.dezena-sorteada {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+/* Estilo para as dezenas não sorteadas */
+.dezena-nao-sorteada {
+    color: #bbb;
+}
