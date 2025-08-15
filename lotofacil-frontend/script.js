@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableFrequencia = document.getElementById('frequencia-table');
     const loadingMessageFrequencia = document.getElementById('loading');
 
-    const API_URL_FREQUENCIA = 'http://localhost:3000/analise/frequencia';
+    const API_URL_FREQUENCIA = 'https://lotofacil-projeto.onrender.com/analise/frequencia';
 
     fetch(API_URL_FREQUENCIA)
         .then(response => response.json())
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tableMovimentacao.style.display = 'none';
         tableMovimentacaoBody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
 
-        const API_URL_MOVIMENTACAO = `http://localhost:3000/concursos/ultimos/${quantidade}`;
+        const API_URL_MOVIMENTACAO = `https://lotofacil-projeto.onrender.com/concursos/ultimos/${quantidade}`;
 
         fetch(API_URL_MOVIMENTACAO)
             .then(response => {
