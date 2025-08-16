@@ -16,17 +16,22 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Função que contém a lógica de sincronização
+// server.js
+
+// Substitua a sua função syncData inteira por esta
 async function syncData() {
   console.log('🔄 Iniciando a sincronização dos dados...');
   try {
     const urlBase = 'https://api.guidi.dev.br/loteria/lotofacil';
     const response = await axios.get(`${urlBase}/ultimo`);
-    
+
+    // DEBUG - veja exatamente o que vem da API
+    console.log("🔍 Resposta da API:", response.data);
+
     // VERIFICAÇÃO DE SEGURANÇA
-    if (!response || !response.data || !response.data.concurso) {
+    if (!response || !response.data || !response.data.listaDezenas) {
       console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
-      return; 
+      return;
     }
 
     const ultimoConcursoNaAPI = response.data.concurso;
@@ -41,9 +46,9 @@ async function syncData() {
         const concursoExistente = await Lotofacil.findOne({ concurso: i });
         if (concursoExistente) {
           console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
-          continue; 
+          continue;
         }
-        
+
         const res = await axios.get(`${urlBase}/${i}`);
         const dados = res.data;
         const novoConcurso = new Lotofacil({
@@ -80,11 +85,11 @@ async function connectDB() {
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    
+
     syncData(); // Inicia a sincronização no primeiro deploy
 
     // Agende a tarefa para rodar todos os dias às 21:00 (9 PM)
-    cron.schedule('0 21 * * *', () => {
+    cron.schedule('* * * * *', () => {
       console.log('Agendador: Executando a sincronização diária...');
       syncData();
     }, {
@@ -126,7 +131,7 @@ app.get('/concursos/ultimos/:quantidade', async (req, res) => {
     const concursos = await Lotofacil.find()
       .sort({ concurso: -1 })
       .limit(quantidade);
-      
+
     res.json(concursos.reverse());
   } catch (err) {
     console.error("Erro ao buscar últimos concursos:", err);
