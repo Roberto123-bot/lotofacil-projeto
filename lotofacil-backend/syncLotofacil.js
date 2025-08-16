@@ -1,16 +1,9 @@
-// server.js
-import express from "express";
+// syncLotofacil.js
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import cors from "cors";
-import cron from "node-cron";
 import axios from "axios";
+import dotenv from "dotenv";
 
 dotenv.config();
-
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 // Conexão MongoDB
 mongoose.connect(process.env.MONGO_URI);
@@ -26,6 +19,7 @@ const lotofacilSchema = new mongoose.Schema({
 
 const Lotofacil = mongoose.model("Lotofacil", lotofacilSchema, "lotofacils");
 
+// 🔹 Função para normalizar os dados da API para o formato do banco
 function normalizarConcurso(apiData) {
   return {
     concurso: apiData.numero,
@@ -43,21 +37,25 @@ function normalizarConcurso(apiData) {
 
 async function syncLotofacil() {
   try {
+    // 1 - Descobrir último concurso salvo
     const ultimoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
     const ultimoNumero = ultimoSalvo ? ultimoSalvo.concurso : 0;
 
     console.log("Último salvo no banco:", ultimoNumero);
 
+    // 2 - Buscar último concurso na API
     const { data: ultimoApi } = await axios.get("https://api.guidi.dev.br/loteria/lotofacil/ultimo");
     const ultimoApiNumero = Number(ultimoApi.numero);
 
     console.log("Último disponível na API:", ultimoApiNumero);
 
+    // 3 - Se já está atualizado, encerrar
     if (ultimoNumero >= ultimoApiNumero) {
       console.log("Banco já está atualizado ✅");
       return;
     }
 
+    // 4 - Buscar concursos faltantes
     for (let i = ultimoNumero + 1; i <= ultimoApiNumero; i++) {
       try {
         const { data } = await axios.get(`https://api.guidi.dev.br/loteria/lotofacil/${i}`);
@@ -72,22 +70,9 @@ async function syncLotofacil() {
     console.log("Sincronização concluída 🚀");
   } catch (error) {
     console.error("Erro na sincronização:", error.message);
+  } finally {
+    mongoose.connection.close();
   }
 }
 
-// 🔹 Rodar a sincronização automaticamente todo dia às 03h
-cron.schedule("0 3 * * *", async () => {
-  console.log("⏰ Rodando sincronização automática da Lotofácil...");
-  await syncLotofacil();
-});
-
-// 🔹 Roda uma vez quando o servidor inicia
 syncLotofacil();
-
-// Rota de teste
-app.get("/", (req, res) => {
-  res.send("Servidor ativo 🚀");
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
