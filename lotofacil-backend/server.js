@@ -1,46 +1,162 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const cron = require('node-cron');
-const syncData = require('./sync');
-const Concurso = require('./models/Concurso.js');
+// index.js
+import dotenv from 'dotenv';
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import cron from 'node-cron';
+import axios from 'axios';
+import Lotofacil from './models/Lotofacil.js';
 
-const MONGO_URI = 'mongodb+srv://robertosantosloteria:cchzSvHgUzLHecmO@cluster0.fuyxwq1.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0';
+dotenv.config();
+
+const MONGO_URI = process.env.MONGO_URI;
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(cors());
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ Conectado ao MongoDB"))
-  .catch(err => console.error("❌ Erro MongoDB", err));
+// Função que contém a lógica de sincronização
+async function syncData() {
+  console.log('🔄 Iniciando a sincronização dos dados...');
+  try {
+    const urlBase = 'https://loteriascaixa-api.herokuapp.com/api/lotofacil';
+    const response = await axios.get(urlBase);
+    
+    // VERIFICAÇÃO DE SEGURANÇA
+    if (!response || !response.data || !response.data.concurso) {
+      console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
+      return; 
+    }
 
-// Rota: último concurso
-app.get('/lotofacil/ultimo', async (req, res) => {
-  const ultimo = await Concurso.findOne().sort({ concurso: -1 });
-  res.json(ultimo);
+    const ultimoConcursoNaAPI = response.data.concurso;
+    const ultimoConcursoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
+    const ultimoConcursoDoBanco = ultimoConcursoSalvo ? ultimoConcursoSalvo.concurso : 0;
+
+    console.log(`✅ Último concurso na API: ${ultimoConcursoNaAPI}`);
+    console.log(`✅ Último concurso salvo no banco: ${ultimoConcursoDoBanco}`);
+
+    for (let i = ultimoConcursoDoBanco + 1; i <= ultimoConcursoNaAPI; i++) {
+      try {
+        const concursoExistente = await Lotofacil.findOne({ concurso: i });
+        if (concursoExistente) {
+          console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
+          continue; 
+        }
+        
+        const res = await axios.get(`${urlBase}/${i}`);
+        const dados = res.data;
+        const novoConcurso = new Lotofacil({
+          concurso: dados.concurso,
+          data: dados.data,
+          dezenas: dados.listaDezenas.sort(),
+          local: dados.localSorteio,
+          valorEstimadoProximoConcurso: dados.valorEstimadoProximoConcurso
+        });
+        await novoConcurso.save();
+        console.log(`✅ Concurso ${i} salvo com sucesso`);
+      } catch (error) {
+        console.error(`❌ Erro ao buscar/salvar o concurso ${i}:`, error.message);
+      }
+    }
+    console.log('✅ Sincronização concluída.');
+  } catch (error) {
+    console.error('❌ Erro na sincronização:', error.message);
+  }
+}
+
+// Conectar ao MongoDB
+async function connectDB() {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log("✅ Conectado ao MongoDB para a API");
+  } catch (err) {
+    console.error("Erro ao conectar no MongoDB:", err);
+    process.exit(1);
+  }
+}
+
+// Iniciar o servidor
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    
+    syncData(); // Inicia a sincronização no primeiro deploy
+
+    // Agende a tarefa para rodar todos os dias às 21:00 (9 PM)
+    cron.schedule('0 21 * * *', () => {
+      console.log('Agendador: Executando a sincronização diária...');
+      syncData();
+    }, {
+      timezone: "America/Sao_Paulo"
+    });
+  });
 });
 
-// Rota: concurso específico
-app.get('/lotofacil/:numero', async (req, res) => {
-  const conc = await Concurso.findOne({ concurso: req.params.numero });
-  res.json(conc);
+// Definir as rotas para a API
+app.get('/analise/frequencia', async (req, res) => {
+  try {
+    const concursos = await Lotofacil.find({}, { dezenas: 1 });
+    const frequencia = {};
+    for (let i = 1; i <= 25; i++) {
+      frequencia[i] = 0;
+    }
+
+    concursos.forEach(concurso => {
+      concurso.dezenas.forEach(dezena => {
+        frequencia[parseInt(dezena)]++;
+      });
+    });
+
+    const resultado = Object.keys(frequencia).map(key => ({
+      dezena: parseInt(key),
+      total: frequencia[key]
+    })).sort((a, b) => b.total - a.total);
+
+    res.json(resultado);
+  } catch (err) {
+    console.error("Erro na análise de frequência:", err);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 });
 
-// Rota: últimos X concursos
-app.get('/lotofacil', async (req, res) => {
-  const { limit = 10 } = req.query;
-  const concursos = await Concurso.find().sort({ concurso: -1 }).limit(parseInt(limit));
-  res.json(concursos);
+app.get('/concursos/ultimos/:quantidade', async (req, res) => {
+  try {
+    const quantidade = parseInt(req.params.quantidade);
+    const concursos = await Lotofacil.find()
+      .sort({ concurso: -1 })
+      .limit(quantidade);
+      
+    res.json(concursos.reverse());
+  } catch (err) {
+    console.error("Erro ao buscar últimos concursos:", err);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 });
 
-// Rodar sincronização todo dia às 2h
-cron.schedule('0 2 * * *', () => {
-  console.log("⏳ Atualizando banco...");
-  syncData();
+app.get('/analise/parimpar', async (req, res) => {
+  try {
+    const concursos = await Lotofacil.find({});
+    const resultado = concursos.map(concurso => {
+      let pares = 0;
+      let impares = 0;
+      concurso.dezenas.forEach(dezena => {
+        if (parseInt(dezena) % 2 === 0) {
+          pares++;
+        } else {
+          impares++;
+        }
+      });
+      return {
+        concurso: concurso.concurso,
+        pares: pares,
+        impares: impares,
+        data: concurso.data
+      };
+    });
+    res.json(resultado);
+  } catch (err) {
+    console.error("Erro na análise de par e ímpar:", err);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 });
-
-app.get('/', (req, res) => {
-  res.send('API da Lotofácil está funcionando! 🏆');
-});
-
-app.listen(3000, () => console.log("🚀 Servidor rodando na porta 3000"));
