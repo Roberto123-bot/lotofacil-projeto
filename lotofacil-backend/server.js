@@ -16,13 +16,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Função que contém a lógica de sincronização
+// Substitua a sua função syncData inteira por esta
 async function syncData() {
   console.log('🔄 Iniciando a sincronização dos dados...');
   try {
-    const urlBase = 'https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/';
-    const response = await axios.get(urlBase);
-    
+    const urlBase = 'https://api.guidi.dev.br/loteria/lotofacil';
+    const response = await axios.get(`${urlBase}/ultimo`);
+
     // VERIFICAÇÃO DE SEGURANÇA
     if (!response || !response.data || !response.data.concurso) {
       console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
@@ -43,14 +43,14 @@ async function syncData() {
           console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
           continue; 
         }
-        
+
         const res = await axios.get(`${urlBase}/${i}`);
         const dados = res.data;
         const novoConcurso = new Lotofacil({
           concurso: dados.concurso,
           data: dados.data,
-          dezenas: dados.listaDezenas.sort(),
-          local: dados.localSorteio,
+          dezenas: dados.dezenas.sort(),
+          local: dados.local,
           valorEstimadoProximoConcurso: dados.valorEstimadoProximoConcurso
         });
         await novoConcurso.save();
