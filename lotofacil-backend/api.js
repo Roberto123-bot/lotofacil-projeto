@@ -74,7 +74,7 @@ connectDB().then(() => {
     syncData();
 
     // Agende a tarefa para rodar todos os dias às 21:00 (9 PM)
-    cron.schedule('0 21 * * *', () => {
+    cron.schedule('0 22 * * *', () => {
       console.log('Agendador: Executando a sincronização diária...');
       syncData();
     }, {
