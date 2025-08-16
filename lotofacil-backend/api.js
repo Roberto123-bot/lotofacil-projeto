@@ -17,14 +17,19 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Função que conterá a lógica de sincronização do syncAll.js
 async function syncData() {
   console.log('🔄 Iniciando a sincronização dos dados...');
   try {
-    const urlBase = 'http://loteriascaixa-api.herokuapp.com/api/lotofacil';
+    const urlBase = 'https://loteriascaixa-api.herokuapp.com/api/lotofacil';
     const response = await axios.get(urlBase);
-    const ultimoConcursoNaAPI = response.data.concurso;
 
+    // VERIFICAÇÃO ADICIONADA: Checa se a resposta é válida
+    if (!response || !response.data || !response.data.concurso) {
+      console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
+      return; // Para a execução da função
+    }
+
+    const ultimoConcursoNaAPI = response.data.concurso;
     const ultimoConcursoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
     const ultimoConcursoDoBanco = ultimoConcursoSalvo ? ultimoConcursoSalvo.concurso : 0;
 
@@ -34,13 +39,12 @@ async function syncData() {
     // Loop para buscar e salvar apenas os novos concursos
     for (let i = ultimoConcursoDoBanco + 1; i <= ultimoConcursoNaAPI; i++) {
       try {
-        // Verifica se o concurso já existe para evitar erros de duplicidade
         const concursoExistente = await Lotofacil.findOne({ concurso: i });
         if (concursoExistente) {
           console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
-          continue; // Pula para a próxima iteração
+          continue;
         }
-        
+
         const res = await axios.get(`${urlBase}/${i}`);
         const dados = res.data;
         const novoConcurso = new Lotofacil({
@@ -77,7 +81,7 @@ async function connectDB() {
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    
+
     // Inicie a sincronização imediatamente no primeiro deploy
     syncData();
 
@@ -124,7 +128,7 @@ app.get('/concursos/ultimos/:quantidade', async (req, res) => {
     const concursos = await Lotofacil.find()
       .sort({ concurso: -1 })
       .limit(quantidade);
-      
+
     res.json(concursos.reverse());
   } catch (err) {
     console.error("Erro ao buscar últimos concursos:", err);
