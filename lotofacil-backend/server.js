@@ -10,7 +10,6 @@ import Lotofacil from './models/Lotofacil.js';
 dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI;
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -23,12 +22,12 @@ async function syncData() {
     const response = await axios.get(`${urlBase}/ultimo`);
     const data = response.data;
 
-    if (!data || !data.numero) {
+    if (!data || !data.concurso) {
       console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
       return;
     }
 
-    const ultimoConcursoNaAPI = data.numero;
+    const ultimoConcursoNaAPI = data.concurso;
     const ultimoConcursoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
     const ultimoConcursoDoBanco = ultimoConcursoSalvo ? ultimoConcursoSalvo.concurso : 0;
 
@@ -40,22 +39,21 @@ async function syncData() {
         const res = await axios.get(`${urlBase}/${i}`);
         const dados = res.data;
 
-        if (!dados || !dados.numero) {
+        if (!dados || !dados.concurso) {
           console.warn(`⚠️ Concurso ${i} não encontrado na API.`);
           continue;
         }
 
-        const concursoExistente = await Lotofacil.findOne({ concurso: dados.numero });
+        const concursoExistente = await Lotofacil.findOne({ concurso: dados.concurso });
         if (concursoExistente) {
           console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
           continue;
         }
 
         const novoConcurso = new Lotofacil({
-          concurso: dados.numero,
+          concurso: dados.concurso,
           data: dados.dataApuracao,
           dezenas: dados.listaDezenas.sort(),
-          local: dados.localSorteio,
           valorEstimadoProximoConcurso: dados.valorEstimadoProximoConcurso,
           valorAcumuladoConcursoEspecial: dados.valorAcumuladoConcursoEspecial,
           premiacoes: dados.listaRateioPremio?.map(p => ({
@@ -98,7 +96,7 @@ connectDB().then(() => {
     syncData(); // Executa no start
 
     // Agendamento (todo dia às 21h)
-    cron.schedule('* * * * *', () => {
+    cron.schedule("* * * * *", () => {
       console.log('⏰ Agendador: Executando a sincronização diária...');
       syncData();
     }, {
