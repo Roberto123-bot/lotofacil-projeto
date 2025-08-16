@@ -90,7 +90,7 @@ td:first-child {
 .dezena-sorteada {
     background-color: #4CAF50;
     color: white;
-    border-radius: 50%;
+    border-radius: 10%;
     width: 25px;
     height: 25px;
     display: inline-flex;
