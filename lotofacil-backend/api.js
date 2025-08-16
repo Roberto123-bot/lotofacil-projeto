@@ -3,9 +3,11 @@ import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import Lotofacil from './models/Lotofacil.js'; // Seu modelo de concurso
+import cron from 'node-cron';
+import axios from 'axios';
+import Lotofacil from './models/Lotofacil.js';
 
-dotenv.config(); // Carrega as variáveis do .env
+dotenv.config();
 
 // A forma CORRETA de ler a string de conexão do ambiente de produção
 const MONGO_URI = process.env.MONGO_URI;
@@ -14,6 +16,43 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+
+// Função que conterá a lógica de sincronização do syncAll.js
+async function syncData() {
+  console.log('🔄 Iniciando a sincronização dos dados...');
+  try {
+    const urlBase = 'http://loteriascaixa-api.herokuapp.com/api/lotofacil';
+    const response = await axios.get(urlBase);
+    const ultimoConcurso = response.data.concurso;
+
+    const ultimoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
+    const ultimoConcursoSalvo = ultimoSalvo ? ultimoSalvo.concurso : 0;
+
+    console.log(`✅ Último concurso na API: ${ultimoConcurso}`);
+    console.log(`✅ Último concurso salvo no banco: ${ultimoConcursoSalvo}`);
+
+    for (let i = ultimoConcursoSalvo + 1; i <= ultimoConcurso; i++) {
+      try {
+        const res = await axios.get(`${urlBase}/${i}`);
+        const dados = res.data;
+        const novoConcurso = new Lotofacil({
+          concurso: dados.concurso,
+          data: dados.data,
+          dezenas: dados.listaDezenas.sort(),
+          local: dados.localSorteio,
+          valorEstimadoProximoConcurso: dados.valorEstimadoProximoConcurso
+        });
+        await novoConcurso.save();
+        console.log(`✅ Concurso ${i} salvo com sucesso`);
+      } catch (error) {
+        console.error(`❌ Erro ao buscar/salvar o concurso ${i}:`, error.message);
+      }
+    }
+    console.log('✅ Sincronização concluída.');
+  } catch (error) {
+    console.error('❌ Erro na sincronização:', error.message);
+  }
+}
 
 // Conectar ao MongoDB
 async function connectDB() {
@@ -26,32 +65,31 @@ async function connectDB() {
   }
 }
 
-// Definir uma rota para buscar todos os concursos
-app.get('/concursos', async (req, res) => {
-  try {
-    const concursos = await Lotofacil.find().sort({ concurso: 1 });
-    res.json(concursos);
-  } catch (err) {
-    console.error("Erro ao buscar concursos:", err);
-    res.status(500).json({ message: "Erro interno do servidor" });
-  }
-});
-
 // Iniciar o servidor
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    
+    // Inicie a sincronização imediatamente no primeiro deploy
+    syncData();
+
+    // Agende a tarefa para rodar todos os dias às 21:00 (9 PM)
+    cron.schedule('0 21 * * *', () => {
+      console.log('Agendador: Executando a sincronização diária...');
+      syncData();
+    }, {
+      timezone: "America/Sao_Paulo"
+    });
   });
 });
 
-// ... dentro do seu arquivo api.js
-
+// Definir as rotas para a API
 app.get('/analise/frequencia', async (req, res) => {
   try {
-    const concursos = await Lotofacil.find({}, { dezenas: 1 }); // Buscar apenas as dezenas
+    const concursos = await Lotofacil.find({}, { dezenas: 1 });
     const frequencia = {};
     for (let i = 1; i <= 25; i++) {
-      frequencia[i] = 0; // Inicializa o contador para cada dezena
+      frequencia[i] = 0;
     }
 
     concursos.forEach(concurso => {
@@ -60,11 +98,10 @@ app.get('/analise/frequencia', async (req, res) => {
       });
     });
 
-    // Converter o objeto para um array para facilitar a ordenação
     const resultado = Object.keys(frequencia).map(key => ({
       dezena: parseInt(key),
       total: frequencia[key]
-    })).sort((a, b) => b.total - a.total); // Ordena do mais frequente para o menos
+    })).sort((a, b) => b.total - a.total);
 
     res.json(resultado);
   } catch (err) {
@@ -73,8 +110,21 @@ app.get('/analise/frequencia', async (req, res) => {
   }
 });
 
-// ... dentro do seu arquivo api.js
+app.get('/concursos/ultimos/:quantidade', async (req, res) => {
+  try {
+    const quantidade = parseInt(req.params.quantidade);
+    const concursos = await Lotofacil.find()
+      .sort({ concurso: -1 })
+      .limit(quantidade);
+      
+    res.json(concursos.reverse());
+  } catch (err) {
+    console.error("Erro ao buscar últimos concursos:", err);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
 
+// A rota de parimpar que você tinha antes
 app.get('/analise/parimpar', async (req, res) => {
   try {
     const concursos = await Lotofacil.find({});
@@ -98,24 +148,6 @@ app.get('/analise/parimpar', async (req, res) => {
     res.json(resultado);
   } catch (err) {
     console.error("Erro na análise de par e ímpar:", err);
-    res.status(500).json({ message: "Erro interno do servidor" });
-  }
-});
-
-// Rota para buscar os últimos 'N' concursos
-app.get('/concursos/ultimos/:quantidade', async (req, res) => {
-  try {
-    const quantidade = parseInt(req.params.quantidade);
-    
-    // A query busca todos os concursos, ordena pelo maior número (mais recente) e limita pela quantidade
-    const concursos = await Lotofacil.find()
-      .sort({ concurso: -1 })
-      .limit(quantidade);
-      
-    // Envia os concursos em ordem crescente, do mais antigo para o mais recente
-    res.json(concursos.reverse());
-  } catch (err) {
-    console.error("Erro ao buscar últimos concursos:", err);
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
