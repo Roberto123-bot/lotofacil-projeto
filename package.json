@@ -2,11 +2,11 @@
   "name": "lotofacil-projeto-principal",
   "version": "1.0.0",
   "description": "Projeto de analise para lotofacil.",
-  "main": "lotofacil-backend/api.js",  
+  "main": "lotofacil-backend/server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node lotofacil-backend/api.js"
+    "start": "node lotofacil-backend/server.js"
   },
   "keywords": [],
   "author": "",
