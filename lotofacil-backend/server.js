@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Conexão MongoDB
+// 🔹 Conexão MongoDB
 mongoose.connect(process.env.MONGO_URI);
 
 const lotofacilSchema = new mongoose.Schema({
@@ -26,6 +26,7 @@ const lotofacilSchema = new mongoose.Schema({
 
 const Lotofacil = mongoose.model("Lotofacil", lotofacilSchema, "lotofacils");
 
+// 🔹 Função para normalizar os dados da API para o formato do banco
 function normalizarConcurso(apiData) {
   return {
     concurso: apiData.numero,
@@ -41,6 +42,7 @@ function normalizarConcurso(apiData) {
   };
 }
 
+// 🔹 Função de sincronização
 async function syncLotofacil() {
   try {
     const ultimoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
@@ -75,19 +77,62 @@ async function syncLotofacil() {
   }
 }
 
-// 🔹 Rodar a sincronização automaticamente todo dia às 03h
+// 🔹 Rota: forçar sincronização manual
+app.get("/sync", async (req, res) => {
+  try {
+    await syncLotofacil();
+    res.json({ message: "Sincronização concluída com sucesso 🚀" });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao sincronizar: " + error.message });
+  }
+});
+
+// 🔹 Rota: análise de frequência
+app.get("/analise/frequencia", async (req, res) => {
+  try {
+    const pipeline = [
+      { $unwind: "$dezenas" },
+      { $group: { _id: "$dezenas", total: { $sum: 1 } } },
+      { $sort: { total: -1 } }
+    ];
+
+    const resultado = await Lotofacil.aggregate(pipeline);
+
+    res.json(resultado.map(item => ({
+      dezena: item._id,
+      total: item.total
+    })));
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao calcular frequência: " + error.message });
+  }
+});
+
+// 🔹 Rota: últimos concursos (para tabela de movimentação)
+app.get("/concursos/ultimos/:qtd", async (req, res) => {
+  try {
+    const qtd = parseInt(req.params.qtd) || 10;
+    const concursos = await Lotofacil.find().sort({ concurso: -1 }).limit(qtd);
+
+    res.json(concursos.reverse()); // do mais antigo para o mais novo
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar concursos: " + error.message });
+  }
+});
+
+// 🔹 Cron: rodar automaticamente todo dia às 03h
 cron.schedule("0 3 * * *", async () => {
   console.log("⏰ Rodando sincronização automática da Lotofácil...");
   await syncLotofacil();
 });
 
-// 🔹 Roda uma vez quando o servidor inicia
+// 🔹 Rodar uma vez ao iniciar
 syncLotofacil();
 
-// Rota de teste
+// 🔹 Rota base
 app.get("/", (req, res) => {
   res.send("Servidor ativo 🚀");
 });
 
+// 🔹 Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
