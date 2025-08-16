@@ -98,7 +98,7 @@ connectDB().then(() => {
     syncData(); // Executa no start
 
     // Agendamento (todo dia às 21h)
-    cron.schedule('0 21 * * *', () => {
+    cron.schedule('* * * * *', () => {
       console.log('⏰ Agendador: Executando a sincronização diária...');
       syncData();
     }, {
