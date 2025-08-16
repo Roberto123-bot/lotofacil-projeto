@@ -23,16 +23,24 @@ async function syncData() {
   try {
     const urlBase = 'http://loteriascaixa-api.herokuapp.com/api/lotofacil';
     const response = await axios.get(urlBase);
-    const ultimoConcurso = response.data.concurso;
+    const ultimoConcursoNaAPI = response.data.concurso;
 
-    const ultimoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
-    const ultimoConcursoSalvo = ultimoSalvo ? ultimoSalvo.concurso : 0;
+    const ultimoConcursoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
+    const ultimoConcursoDoBanco = ultimoConcursoSalvo ? ultimoConcursoSalvo.concurso : 0;
 
-    console.log(`✅ Último concurso na API: ${ultimoConcurso}`);
-    console.log(`✅ Último concurso salvo no banco: ${ultimoConcursoSalvo}`);
+    console.log(`✅ Último concurso na API: ${ultimoConcursoNaAPI}`);
+    console.log(`✅ Último concurso salvo no banco: ${ultimoConcursoDoBanco}`);
 
-    for (let i = ultimoConcursoSalvo + 1; i <= ultimoConcurso; i++) {
+    // Loop para buscar e salvar apenas os novos concursos
+    for (let i = ultimoConcursoDoBanco + 1; i <= ultimoConcursoNaAPI; i++) {
       try {
+        // Verifica se o concurso já existe para evitar erros de duplicidade
+        const concursoExistente = await Lotofacil.findOne({ concurso: i });
+        if (concursoExistente) {
+          console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
+          continue; // Pula para a próxima iteração
+        }
+        
         const res = await axios.get(`${urlBase}/${i}`);
         const dados = res.data;
         const novoConcurso = new Lotofacil({
