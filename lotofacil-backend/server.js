@@ -20,7 +20,7 @@ app.use(cors());
 async function syncData() {
   console.log('🔄 Iniciando a sincronização dos dados...');
   try {
-    const urlBase = 'https://loteriascaixa-api.herokuapp.com/api/lotofacil';
+    const urlBase = 'https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/';
     const response = await axios.get(urlBase);
     
     // VERIFICAÇÃO DE SEGURANÇA
