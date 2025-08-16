@@ -1,4 +1,4 @@
-// index.js
+// server.js
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -16,13 +16,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Substitua a sua função syncData inteira por esta
+// Função que contém a lógica de sincronização
 async function syncData() {
   console.log('🔄 Iniciando a sincronização dos dados...');
   try {
     const urlBase = 'https://api.guidi.dev.br/loteria/lotofacil';
     const response = await axios.get(`${urlBase}/ultimo`);
-
+    
     // VERIFICAÇÃO DE SEGURANÇA
     if (!response || !response.data || !response.data.concurso) {
       console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
@@ -43,7 +43,7 @@ async function syncData() {
           console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
           continue; 
         }
-
+        
         const res = await axios.get(`${urlBase}/${i}`);
         const dados = res.data;
         const novoConcurso = new Lotofacil({
@@ -84,7 +84,7 @@ connectDB().then(() => {
     syncData(); // Inicia a sincronização no primeiro deploy
 
     // Agende a tarefa para rodar todos os dias às 21:00 (9 PM)
-    cron.schedule('* * * * *', () => {
+    cron.schedule('0 21 * * *', () => {
       console.log('Agendador: Executando a sincronização diária...');
       syncData();
     }, {
