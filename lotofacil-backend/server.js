@@ -16,25 +16,19 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// server.js
-
-// Substitua a sua função syncData inteira por esta
 async function syncData() {
   console.log('🔄 Iniciando a sincronização dos dados...');
   try {
     const urlBase = 'https://api.guidi.dev.br/loteria/lotofacil';
     const response = await axios.get(`${urlBase}/ultimo`);
+    const data = response.data;
 
-    // DEBUG - veja exatamente o que vem da API
-    console.log("🔍 Resposta da API:", response.data);
-
-    // VERIFICAÇÃO DE SEGURANÇA
-    if (!response || !response.data || !response.data.listaDezenas) {
+    if (!data || !data.numero) {
       console.error('❌ Erro: Resposta da API pública inválida ou incompleta.');
       return;
     }
 
-    const ultimoConcursoNaAPI = response.data.concurso;
+    const ultimoConcursoNaAPI = data.numero;
     const ultimoConcursoSalvo = await Lotofacil.findOne().sort({ concurso: -1 });
     const ultimoConcursoDoBanco = ultimoConcursoSalvo ? ultimoConcursoSalvo.concurso : 0;
 
@@ -43,27 +37,42 @@ async function syncData() {
 
     for (let i = ultimoConcursoDoBanco + 1; i <= ultimoConcursoNaAPI; i++) {
       try {
-        const concursoExistente = await Lotofacil.findOne({ concurso: i });
+        const res = await axios.get(`${urlBase}/${i}`);
+        const dados = res.data;
+
+        if (!dados || !dados.numero) {
+          console.warn(`⚠️ Concurso ${i} não encontrado na API.`);
+          continue;
+        }
+
+        const concursoExistente = await Lotofacil.findOne({ concurso: dados.numero });
         if (concursoExistente) {
           console.log(`❕ Concurso ${i} já existe no banco de dados. Pulando.`);
           continue;
         }
 
-        const res = await axios.get(`${urlBase}/${i}`);
-        const dados = res.data;
         const novoConcurso = new Lotofacil({
-          concurso: dados.concurso,
-          data: dados.data,
-          dezenas: dados.dezenas.sort(),
-          local: dados.local,
-          valorEstimadoProximoConcurso: dados.valorEstimadoProximoConcurso
+          concurso: dados.numero,
+          data: dados.dataApuracao,
+          dezenas: dados.listaDezenas.sort(),
+          local: dados.localSorteio,
+          valorEstimadoProximoConcurso: dados.valorEstimadoProximoConcurso,
+          valorAcumuladoConcursoEspecial: dados.valorAcumuladoConcursoEspecial,
+          premiacoes: dados.listaRateioPremio?.map(p => ({
+            descricao: p.descricaoFaixa,
+            faixa: p.faixa,
+            ganhadores: p.numeroDeGanhadores,
+            valor: p.valorPremio,
+          })) || []
         });
+
         await novoConcurso.save();
         console.log(`✅ Concurso ${i} salvo com sucesso`);
       } catch (error) {
         console.error(`❌ Erro ao buscar/salvar o concurso ${i}:`, error.message);
       }
     }
+
     console.log('✅ Sincronização concluída.');
   } catch (error) {
     console.error('❌ Erro na sincronização:', error.message);
@@ -86,11 +95,11 @@ connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 
-    syncData(); // Inicia a sincronização no primeiro deploy
+    syncData(); // Executa no start
 
-    // Agende a tarefa para rodar todos os dias às 21:00 (9 PM)
-    cron.schedule('* * * * *', () => {
-      console.log('Agendador: Executando a sincronização diária...');
+    // Agendamento (todo dia às 21h)
+    cron.schedule('0 21 * * *', () => {
+      console.log('⏰ Agendador: Executando a sincronização diária...');
       syncData();
     }, {
       timezone: "America/Sao_Paulo"
@@ -98,7 +107,9 @@ connectDB().then(() => {
   });
 });
 
-// Definir as rotas para a API
+// ---------------- Rotas ----------------
+
+// Frequência das dezenas
 app.get('/analise/frequencia', async (req, res) => {
   try {
     const concursos = await Lotofacil.find({}, { dezenas: 1 });
@@ -125,6 +136,7 @@ app.get('/analise/frequencia', async (req, res) => {
   }
 });
 
+// Últimos concursos
 app.get('/concursos/ultimos/:quantidade', async (req, res) => {
   try {
     const quantidade = parseInt(req.params.quantidade);
@@ -139,6 +151,7 @@ app.get('/concursos/ultimos/:quantidade', async (req, res) => {
   }
 });
 
+// Análise par/impar
 app.get('/analise/parimpar', async (req, res) => {
   try {
     const concursos = await Lotofacil.find({});
@@ -146,16 +159,13 @@ app.get('/analise/parimpar', async (req, res) => {
       let pares = 0;
       let impares = 0;
       concurso.dezenas.forEach(dezena => {
-        if (parseInt(dezena) % 2 === 0) {
-          pares++;
-        } else {
-          impares++;
-        }
+        if (parseInt(dezena) % 2 === 0) pares++;
+        else impares++;
       });
       return {
         concurso: concurso.concurso,
-        pares: pares,
-        impares: impares,
+        pares,
+        impares,
         data: concurso.data
       };
     });
