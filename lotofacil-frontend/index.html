@@ -1,50 +1,173 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Análise Lotofácil</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f7f7f7;
+      }
+
+      header {
+        background: #6c2bb8;
+        color: #fff;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      .tabs {
+        display: flex;
+        background: #ddd;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        font-weight: bold;
+        background: #ccc;
+        transition: background 0.3s;
+      }
+
+      .tab.active {
+        background: #fff;
+        border-bottom: 3px solid #6c2bb8;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 1rem;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 1rem;
+        background: #fff;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 0.6rem;
+        text-align: center;
+      }
+
+      th {
+        background: #eee;
+      }
+
+      .botoes-container {
+        margin: 1rem 0;
+        display: flex;
+        gap: 10px;
+      }
+
+      .botoes-container button {
+        padding: 0.6rem 1rem;
+        border: none;
+        background: #6c2bb8;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background 0.3s;
+      }
+
+      .botoes-container button:hover {
+        background: #532091;
+      }
+
+      .loading {
+        font-weight: bold;
+        color: #6c2bb8;
+      }
+    </style>
+  </head>
+  <body>
     <header>
-        <h1>Análise de Frequência - Lotofácil</h1>
-        <p>Tabela com as dezenas mais sorteadas de todos os concursos.</p>
+      <h1>Análise Lotofácil</h1>
     </header>
 
-    <main>
-        <div id="loading">Carregando dados...</div>
-        <table id="frequencia-table" style="display: none;">
-            <thead>
-                <tr>
-                    <th>Posição</th>
-                    <th>Dezena</th>
-                    <th>Total de Sorteios</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+    <!-- Abas -->
+    <div class="tabs">
+      <div class="tab active" data-tab="frequencia">Frequência</div>
+      <div class="tab" data-tab="movimentacao">Movimentação</div>
+    </div>
 
-        <hr>
-        <h1>Tabela de Movimentação</h1>
-        <div class="botoes-container">
-            <button class="btn-movimentacao" data-quantidade="10">10 Concursos</button>
-            <button class="btn-movimentacao" data-quantidade="20">20 Concursos</button>
-            <button class="btn-movimentacao" data-quantidade="30">30 Concursos</button>
-        </div>
-        <div id="movimentacao-loading" class="loading" style="display:none;">Carregando tabela...</div>
-        <table id="movimentacao-table" style="display: none;">
-            <thead>
-                <tr>
-                    <th>Concurso</th>
-                    </tr>
-            </thead>
-            <tbody>
-                </tbody>
+    <main>
+      <!-- Aba Frequência -->
+      <div id="frequencia" class="tab-content active">
+        <h2>Tabela de Frequência</h2>
+        <p>Dezenas mais sorteadas em todos os concursos.</p>
+        <div id="loading">Carregando dados...</div>
+        <table id="frequencia-table" style="display: none">
+          <thead>
+            <tr>
+              <th>Posição</th>
+              <th>Dezena</th>
+              <th>Total de Sorteios</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
         </table>
+      </div>
+
+      <!-- Aba Movimentação -->
+      <div id="movimentacao" class="tab-content">
+        <h2>Tabela de Movimentação</h2>
+        <div class="botoes-container">
+          <button class="btn-movimentacao" data-quantidade="10">
+            10 Concursos
+          </button>
+          <button class="btn-movimentacao" data-quantidade="20">
+            20 Concursos
+          </button>
+          <button class="btn-movimentacao" data-quantidade="30">
+            30 Concursos
+          </button>
+        </div>
+        <div id="movimentacao-loading" class="loading" style="display: none">
+          Carregando tabela...
+        </div>
+        <table id="movimentacao-table" style="display: none">
+          <thead>
+            <tr>
+              <th>Concurso</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </main>
 
+    <script>
+      // Controle de abas
+      const tabs = document.querySelectorAll(".tab");
+      const contents = document.querySelectorAll(".tab-content");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // Remove active
+          tabs.forEach((t) => t.classList.remove("active"));
+          contents.forEach((c) => c.classList.remove("active"));
+
+          // Ativa a aba
+          tab.classList.add("active");
+          document.getElementById(tab.dataset.tab).classList.add("active");
+        });
+      });
+    </script>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
