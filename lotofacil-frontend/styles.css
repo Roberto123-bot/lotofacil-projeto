@@ -61,7 +61,7 @@ td:first-child {
 }
 
 .btn-movimentacao {
-    background-color: #4CAF50;
+    background-color: #7209b7;
     color: white;
     padding: 10px 20px;
     margin: 0 5px;
@@ -88,7 +88,7 @@ td:first-child {
 
 /* Estilo para as dezenas sorteadas */
 .dezena-sorteada {
-    background-color: #4CAF50;
+    background-color: #7209b7;
     color: white;
     border-radius: 10%;
     width: 25px;
