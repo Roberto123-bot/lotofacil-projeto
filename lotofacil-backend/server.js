@@ -21,7 +21,7 @@ const lotofacilSchema = new mongoose.Schema({
   dezenas: [String],
   premiacoes: Array,
   valorAcumuladoConcursoEspecial: Number,
-  valorEstimadoProximoConcurso: Number
+  valorEstimadoProximoConcurso: Number,
 });
 
 const Lotofacil = mongoose.model("Lotofacil", lotofacilSchema, "lotofacils");
@@ -32,13 +32,14 @@ function normalizarConcurso(apiData) {
     concurso: apiData.numero,
     data: apiData.dataApuracao,
     dezenas: apiData.listaDezenas,
-    premiacoes: apiData.listaRateioPremio?.map(p => ({
-      descricao: p.descricaoFaixa,
-      ganhadores: p.numeroDeGanhadores,
-      premio: p.valorPremio
-    })) || [],
+    premiacoes:
+      apiData.listaRateioPremio?.map((p) => ({
+        descricao: p.descricaoFaixa,
+        ganhadores: p.numeroDeGanhadores,
+        premio: p.valorPremio,
+      })) || [],
     valorAcumuladoConcursoEspecial: apiData.valorAcumuladoConcursoEspecial || 0,
-    valorEstimadoProximoConcurso: apiData.valorEstimadoProximoConcurso || 0
+    valorEstimadoProximoConcurso: apiData.valorEstimadoProximoConcurso || 0,
   };
 }
 
@@ -50,7 +51,9 @@ async function syncLotofacil() {
 
     console.log("Último salvo no banco:", ultimoNumero);
 
-    const { data: ultimoApi } = await axios.get("https://api.guidi.dev.br/loteria/lotofacil/ultimo");
+    const { data: ultimoApi } = await axios.get(
+      "https://api.guidi.dev.br/loteria/lotofacil/ultimo"
+    );
     const ultimoApiNumero = Number(ultimoApi.numero);
 
     console.log("Último disponível na API:", ultimoApiNumero);
@@ -62,7 +65,9 @@ async function syncLotofacil() {
 
     for (let i = ultimoNumero + 1; i <= ultimoApiNumero; i++) {
       try {
-        const { data } = await axios.get(`https://api.guidi.dev.br/loteria/lotofacil/${i}`);
+        const { data } = await axios.get(
+          `https://api.guidi.dev.br/loteria/lotofacil/${i}`
+        );
         const doc = normalizarConcurso(data);
         await Lotofacil.create(doc);
         console.log(`✅ Concurso ${i} salvo com sucesso!`);
@@ -93,17 +98,21 @@ app.get("/analise/frequencia", async (req, res) => {
     const pipeline = [
       { $unwind: "$dezenas" },
       { $group: { _id: "$dezenas", total: { $sum: 1 } } },
-      { $sort: { total: -1 } }
+      { $sort: { total: -1 } },
     ];
 
     const resultado = await Lotofacil.aggregate(pipeline);
 
-    res.json(resultado.map(item => ({
-      dezena: item._id,
-      total: item.total
-    })));
+    res.json(
+      resultado.map((item) => ({
+        dezena: item._id,
+        total: item.total,
+      }))
+    );
   } catch (error) {
-    res.status(500).json({ error: "Erro ao calcular frequência: " + error.message });
+    res
+      .status(500)
+      .json({ error: "Erro ao calcular frequência: " + error.message });
   }
 });
 
@@ -115,7 +124,24 @@ app.get("/concursos/ultimos/:qtd", async (req, res) => {
 
     res.json(concursos.reverse()); // do mais antigo para o mais novo
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar concursos: " + error.message });
+    res
+      .status(500)
+      .json({ error: "Erro ao buscar concursos: " + error.message });
+  }
+});
+
+// 🔹 Rota: último concurso
+app.get("/concursos/ultimo", async (req, res) => {
+  try {
+    const ultimo = await Lotofacil.findOne().sort({ concurso: -1 });
+    if (!ultimo) {
+      return res.status(404).json({ error: "Nenhum concurso encontrado" });
+    }
+    res.json(ultimo);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erro ao buscar último concurso: " + error.message });
   }
 });
 
