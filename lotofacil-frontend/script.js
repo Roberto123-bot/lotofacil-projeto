@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------- ÚLTIMO CONCURSO (para a aba extra) --------
   function carregarUltimoConcurso() {
     const API_URL_ULTIMO =
-      "https://lotofacil-projeto.onrender.com/concursos/ultimo";
+      "https://lotofacil-projeto.onrender.com/api/concursos/ultimo";
     fetch(API_URL_ULTIMO)
       .then((r) => r.json())
       .then((ultimo) => {
