@@ -180,6 +180,10 @@
         font-weight: bold; /* Destaque */
         background: transparent !important; /* Remove fundo colorido */
       }
+
+      .highlight {
+        background-color: #fff6a5 !important; /* amarelo claro */
+      }
     </style>
   </head>
   <body>
@@ -191,6 +195,7 @@
     <div class="tabs">
       <div class="tab active" data-tab="frequencia">Frequência</div>
       <div class="tab" data-tab="movimentacao">Movimentação</div>
+      <div class="tab" data-tab="ultimo">Último Resultado</div>
     </div>
 
     <main>
@@ -236,6 +241,29 @@
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+
+      <!-- Aba Último Resultado -->
+      <div id="ultimo" class="tab-content">
+        <h2>Último Resultado Lotofácil</h2>
+        <div id="ultimo-loading" class="loading">
+          Carregando último resultado...
+        </div>
+
+        <div id="ultimo-conteudo" style="display: none">
+          <p><strong>Concurso:</strong> <span id="ultimo-concurso"></span></p>
+          <p><strong>Data:</strong> <span id="ultimo-data"></span></p>
+
+          <div id="ultimo-dezenas"></div>
+
+          <p>
+            <strong>Acumulado:</strong> R$ <span id="ultimo-acumulado"></span>
+          </p>
+          <p>
+            <strong>Estimativa próximo:</strong> R$
+            <span id="ultimo-estimativa"></span>
+          </p>
+        </div>
       </div>
     </main>
 
