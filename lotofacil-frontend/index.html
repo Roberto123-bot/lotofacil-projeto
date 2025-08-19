@@ -112,7 +112,7 @@
 
       #movimentacao-table th,
       #movimentacao-table td {
-        padding: 8px 5px;
+        padding: 10px 7px;
         text-align: center;
       }
 
@@ -169,6 +169,16 @@
       }
       .linha-temp td {
         background-color: #f5f5f5;
+      }
+
+      /* Força os nomes a ficarem pretos */
+      tr.linha-sequência td:first-child,
+      tr.linha-atrasos td:first-child,
+      tr.linha-frequência td:first-child,
+      tr.linha-temp td:first-child {
+        color: #000 !important; /* Preto */
+        font-weight: bold; /* Destaque */
+        background: transparent !important; /* Remove fundo colorido */
       }
     </style>
   </head>
