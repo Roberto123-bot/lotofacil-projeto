@@ -196,28 +196,37 @@ document.addEventListener("DOMContentLoaded", () => {
   // Carregar a tabela de 10 concursos por padrão
   fetchMovimentacao(10);
 
-  // -------- ÚLTIMO CONCURSO (para a aba extra) --------
-  function carregarUltimoConcurso() {
-    const API_URL_ULTIMO =
-      "https://lotofacil-projeto.onrender.com/concursos/ultimo";
-    fetch(API_URL_ULTIMO)
-      .then((r) => r.json())
-      .then((ultimo) => {
-        const container = document.getElementById("ultimo-concurso");
-        container.innerHTML = `
-          <h3>Concurso ${ultimo.concurso} - ${ultimo.data}</h3>
-          <div class="dezenas-resultado">
-            ${ultimo.dezenas
-              .map((d) => `<span class="bola">${d}</span>`)
-              .join("")}
-          </div>
-          <p>Acumulado: R$ ${ultimo.valorAcumuladoConcursoEspecial}</p>
-          <p>Próximo estimado: R$ ${ultimo.valorEstimadoProximoConcurso}</p>
-        `;
-      })
-      .catch((err) => console.error("Erro ao buscar último concurso:", err));
+  async function carregarUltimoConcurso() {
+    const resp = await fetch(
+      "https://lotofacil-projeto.onrender.com/concursos/ultimo"
+    );
+    const data = await resp.json();
+
+    document.getElementById("uc-concurso").textContent = data.concurso;
+    document.getElementById("uc-data").textContent = data.data;
+
+    // dezenas em bolinhas
+    const dezenasDiv = document.getElementById("uc-dezenas");
+    dezenasDiv.innerHTML = "";
+    data.dezenas.forEach((d) => {
+      const el = document.createElement("div");
+      el.className = "dezena";
+      el.textContent = d;
+      dezenasDiv.appendChild(el);
+    });
+
+    // valores
+    document.getElementById("uc-acumulado").textContent =
+      data.valorAcumuladoConcursoEspecial.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    document.getElementById("uc-estimativa").textContent =
+      data.valorEstimadoProximoConcurso.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
   }
 
-  // chama automaticamente ao carregar
   carregarUltimoConcurso();
 });

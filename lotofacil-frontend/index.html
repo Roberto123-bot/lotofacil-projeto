@@ -184,6 +184,47 @@
       .highlight {
         background-color: #fff6a5 !important; /* amarelo claro */
       }
+
+      #ultimo-concurso {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 12px;
+      }
+
+      .dezenas-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+      }
+
+      .dezenas-container .dezena {
+        background: #6c63ff;
+        color: #fff;
+        font-weight: bold;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+
+      .valores {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+      }
+
+      .valor-card {
+        flex: 1;
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -243,26 +284,26 @@
         </table>
       </div>
 
-      <!-- Aba Último Resultado -->
+      <!-- 🔹 Aba Último Concurso -->
       <div id="ultimo" class="tab-content">
-        <h2>Último Resultado Lotofácil</h2>
-        <div id="ultimo-loading" class="loading">
-          Carregando último resultado...
-        </div>
+        <h2>Último Concurso</h2>
 
-        <div id="ultimo-conteudo" style="display: none">
-          <p><strong>Concurso:</strong> <span id="ultimo-concurso"></span></p>
-          <p><strong>Data:</strong> <span id="ultimo-data"></span></p>
+        <div id="ultimo-concurso" class="card">
+          <p><strong>Concurso:</strong> <span id="uc-concurso"></span></p>
+          <p><strong>Data:</strong> <span id="uc-data"></span></p>
 
-          <div id="ultimo-dezenas"></div>
+          <div class="dezenas-container" id="uc-dezenas"></div>
 
-          <p>
-            <strong>Acumulado:</strong> R$ <span id="ultimo-acumulado"></span>
-          </p>
-          <p>
-            <strong>Estimativa próximo:</strong> R$
-            <span id="ultimo-estimativa"></span>
-          </p>
+          <div class="valores">
+            <div class="valor-card">
+              <p>Acumulado:</p>
+              <span id="uc-acumulado"></span>
+            </div>
+            <div class="valor-card">
+              <p>Estimativa Próximo:</p>
+              <span id="uc-estimativa"></span>
+            </div>
+          </div>
         </div>
       </div>
     </main>
