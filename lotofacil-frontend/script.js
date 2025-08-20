@@ -205,17 +205,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("uc-concurso").textContent = data.concurso;
     document.getElementById("uc-data").textContent = data.data;
 
-    // dezenas em bolinhas
+    // dezenas sorteadas em número inteiro
+    const dezenasSorteadas = data.dezenas.map((d) => parseInt(d, 10));
+
+    // monta painel 5x5 (1..25)
     const dezenasDiv = document.getElementById("uc-dezenas");
     dezenasDiv.innerHTML = "";
-    data.dezenas.forEach((d) => {
+    for (let i = 1; i <= 25; i++) {
       const el = document.createElement("div");
       el.className = "dezena";
-      el.textContent = d;
+      el.textContent = String(i).padStart(2, "0");
+      if (dezenasSorteadas.includes(i)) {
+        el.classList.add("sorteada");
+      }
       dezenasDiv.appendChild(el);
-    });
+    }
 
-    // valores
+    // valores acumulado e estimativa
     document.getElementById("uc-acumulado").textContent =
       data.valorAcumuladoConcursoEspecial.toLocaleString("pt-BR", {
         style: "currency",
