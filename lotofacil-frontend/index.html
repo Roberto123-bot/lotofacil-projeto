@@ -248,6 +248,8 @@
       <div class="tab active" data-tab="frequencia">Frequência</div>
       <div class="tab" data-tab="movimentacao">Movimentação</div>
       <div class="tab" data-tab="ultimo">Último Resultado</div>
+      <div class="tab" data-tab="duplas">Duplas</div>
+      <!-- ✅ Novo -->
     </div>
 
     <main>
@@ -316,6 +318,33 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- 🔹 Aba Duplas -->
+      <div id="duplas" class="tab-content">
+        <h2>Tabela de Duplas (Duques)</h2>
+
+        <div class="botoes-container">
+          <button class="btn-duplas" data-quantidade="10">10 Concursos</button>
+          <button class="btn-duplas" data-quantidade="20">20 Concursos</button>
+          <button class="btn-duplas" data-quantidade="30">30 Concursos</button>
+        </div>
+
+        <div id="duplas-loading" class="loading" style="display: none">
+          Carregando tabela de duplas...
+        </div>
+
+        <table id="duplas-table" style="display: none">
+          <thead>
+            <tr>
+              <th>Dupla</th>
+              <th>Qtd Sorteios</th>
+              <th>Atraso Atual</th>
+              <th>Último Concurso</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </main>
 
