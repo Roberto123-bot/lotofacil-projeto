@@ -1,5 +1,5 @@
 import express from "express";
-import Lotofacil from "../models/Lotofacil";
+import Lotofacil from "../models/Lotofacil.js";
 
 const router = express.Router();
 
