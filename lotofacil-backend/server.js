@@ -145,6 +145,43 @@ app.get("/concursos/ultimo", async (req, res) => {
   }
 });
 
+// 🔹 Rota de análise de duplas (com limite padrão)
+app.get("/analise/duplas", async (req, res) => {
+  try {
+    // pega o query param ?limit=10, se não tiver usa 10 como padrão
+    const limit = parseInt(req.query.limit) || 10;
+
+    // busca só os últimos N concursos
+    const concursos = await Lotofacil.find()
+      .sort({ concurso: -1 }) // mais recentes primeiro
+      .limit(limit);
+
+    // gera todas as duplas dos concursos
+    const contador = {};
+
+    concursos.forEach((c) => {
+      const dezenas = c.dezenas;
+      for (let i = 0; i < dezenas.length; i++) {
+        for (let j = i + 1; j < dezenas.length; j++) {
+          const dupla = [dezenas[i], dezenas[j]].sort().join("-");
+          contador[dupla] = (contador[dupla] || 0) + 1;
+        }
+      }
+    });
+
+    // transforma em array ordenado
+    const resultado = Object.entries(contador)
+      .map(([dupla, total]) => ({ dupla, total }))
+      .sort((a, b) => b.total - a.total);
+
+    res.json(resultado);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erro ao calcular duplas: " + error.message });
+  }
+});
+
 // 🔹 Cron: rodar automaticamente todo dia às 03h
 cron.schedule("0 3 * * *", async () => {
   console.log("⏰ Rodando sincronização automática da Lotofácil...");
