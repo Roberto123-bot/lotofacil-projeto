@@ -1,10 +1,7 @@
 import express from "express";
-import mongoose from "mongoose";
+import Lotofacil from "../models/Lotofacil";
 
 const router = express.Router();
-
-// 🔹 Modelo Lotofacil (usa o mesmo schema do server.js)
-const Lotofacil = mongoose.model("Lotofacil");
 
 // 🔹 Rota para pegar as duplas mais frequentes
 router.get("/", async (req, res) => {
