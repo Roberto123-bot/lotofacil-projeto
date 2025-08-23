@@ -236,7 +236,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   carregarUltimoConcurso();
 
-  // 🔹 Função principal para carregar duplas do BACKEND
+  // 🔹 Gerar todas as 300 combinações de duplas da Lotofácil
+  function gerarDuplas() {
+    const duplas = [];
+    for (let i = 1; i <= 25; i++) {
+      for (let j = i + 1; j <= 25; j++) {
+        duplas.push([i, j]);
+      }
+    }
+    return duplas;
+  }
+
+  // 🔹 Função principal para carregar duplas
   async function carregarDuplas(qtdConcursos = 10) {
     const loading = document.getElementById("duplas-loading");
     const tabela = document.getElementById("duplas-table");
@@ -247,19 +258,51 @@ document.addEventListener("DOMContentLoaded", () => {
     tbody.innerHTML = "";
 
     try {
-      // ✅ Agora consulta direto o backend (que já calcula as duplas)
+      // Buscar últimos concursos do backend
       const resp = await fetch(
-        `https://lotofacil-projeto.onrender.com/duplas?limite=${qtdConcursos}`
+        `https://lotofacil-projeto.onrender.com/concursos/ultimos/${qtdConcursos}`
       );
-      const duplas = await resp.json();
+      const concursos = await resp.json();
+
+      const duplas = gerarDuplas();
+
+      // Estatísticas de cada dupla
+      const stats = duplas.map(([a, b]) => {
+        let qtd = 0;
+        let ultimoConcurso = null;
+        let atraso = 0;
+
+        concursos.forEach((c, idx) => {
+          const dezenas = c.dezenas.map(Number);
+          if (dezenas.includes(a) && dezenas.includes(b)) {
+            qtd++;
+            ultimoConcurso = c.concurso;
+            atraso = 0;
+          } else {
+            atraso++;
+          }
+        });
+
+        return {
+          dupla: `${String(a).padStart(2, "0")}-${String(b).padStart(2, "0")}`,
+          qtd,
+          atraso,
+          ultimoConcurso: ultimoConcurso ?? "-",
+        };
+      });
+
+      // Ordenar por qtd decrescente
+      stats.sort((x, y) => y.qtd - x.qtd);
 
       // Preencher tabela
-      duplas.forEach((d) => {
+      stats.forEach((s) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${d.dupla}</td>
-          <td>${d.qtd}</td>
-        `;
+        <td>${s.dupla}</td>
+        <td>${s.qtd}</td>
+        <td>${s.atraso}</td>
+        <td>${s.ultimoConcurso}</td>
+      `;
         tbody.appendChild(tr);
       });
 
