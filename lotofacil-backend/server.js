@@ -162,27 +162,31 @@ app.get("/analise/duplas", async (req, res) => {
 
     concursos.forEach((c) => {
       const dezenas = c.dezenas;
+      if (c.concurso > maiorConcurso) maiorConcurso = c.concurso;
+
       for (let i = 0; i < dezenas.length; i++) {
         for (let j = i + 1; j < dezenas.length; j++) {
           const dupla = [dezenas[i], dezenas[j]].sort().join("-");
           if (!contador[dupla]) {
             contador[dupla] = { qtd: 0, ultimoConcurso: 0 };
           }
-          contador[dupla].qtd += 1;
-          contador[dupla].ultimoConcurso = c.concurso; // guarda o concurso mais recente que a dupla apareceu
+          contador[dupla].qtd++;
+          if (c.concurso > contador[dupla].ultimoConcurso) {
+            contador[dupla].ultimoConcurso = c.concurso;
+          }
         }
       }
     });
 
-    // transforma em array ordenado
-    const resultado = Object.entries(contador).map(([dupla, dados]) => ({
-      dupla,
-      qtd: dados.qtd,
-      ultimoConcurso: dados.ultimoConcurso,
-      atraso: ultimoConcurso - dados.ultimoConcurso, // diferença entre último e o último que saiu
-    }));
-
-    resultado.sort((a, b) => b.qtd - a.qtd);
+    // transforma em array ordenado e calcula atraso
+    const resultado = Object.entries(contador)
+      .map(([dupla, data]) => ({
+        dupla,
+        qtd: data.qtd,
+        ultimoConcurso: data.ultimoConcurso,
+        atraso: maiorConcurso - data.ultimoConcurso,
+      }))
+      .sort((a, b) => b.qtd - a.qtd);
 
     res.json(resultado);
   } catch (error) {
