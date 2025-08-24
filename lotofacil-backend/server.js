@@ -145,54 +145,6 @@ app.get("/concursos/ultimo", async (req, res) => {
   }
 });
 
-// 🔹 Rota de análise de duplas (com limite padrão)
-app.get("/analise/duplas", async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit) || 10;
-
-    // busca só os últimos N concursos
-    const concursos = await Lotofacil.find()
-      .sort({ concurso: -1 }) // mais recentes primeiro
-      .limit(limit);
-
-    const contador = {};
-    let maiorConcurso = 0;
-
-    concursos.forEach((c) => {
-      const dezenas = c.dezenas.map(Number);
-      if (c.concurso > maiorConcurso) maiorConcurso = c.concurso;
-
-      for (let i = 0; i < dezenas.length; i++) {
-        for (let j = i + 1; j < dezenas.length; j++) {
-          const dupla = [dezenas[i], dezenas[j]].sort().join("-");
-          if (!contador[dupla]) {
-            contador[dupla] = { qtd: 0, ultimoConcurso: 0 };
-          }
-          contador[dupla].qtd++;
-          if (c.concurso > contador[dupla].ultimoConcurso) {
-            contador[dupla].ultimoConcurso = c.concurso;
-          }
-        }
-      }
-    });
-
-    const resultado = Object.entries(contador)
-      .map(([dupla, data]) => ({
-        dupla,
-        qtd: data.qtd,
-        ultimoConcurso: data.ultimoConcurso,
-        atraso: maiorConcurso - data.ultimoConcurso,
-      }))
-      .sort((a, b) => b.qtd - a.qtd);
-
-    res.json(resultado);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Erro ao calcular duplas: " + error.message });
-  }
-});
-
 // 🔹 Cron: rodar automaticamente todo dia às 03h
 cron.schedule("0 3 * * *", async () => {
   console.log("⏰ Rodando sincronização automática da Lotofácil...");
