@@ -146,6 +146,12 @@ document.addEventListener("DOMContentLoaded", () => {
             cellDezena.appendChild(span);
             row.appendChild(cellDezena);
           }
+
+          // 🔹 Novo: permite destacar várias linhas
+          row.addEventListener("click", () => {
+            row.classList.toggle("linha-destacada"); // ativa/desativa destaque
+          });
+
           tableMovimentacaoBody.appendChild(row);
         });
 
