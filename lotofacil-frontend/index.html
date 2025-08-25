@@ -249,6 +249,7 @@
       <div class="tab" data-tab="movimentacao">Movimentação</div>
       <div class="tab" data-tab="ultimo">Último Resultado</div>
       <div class="tab" data-tab="duplas">Duplas</div>
+      <div class="tab" data-tab="trios">Trios</div>
       <!-- ✅ Novo -->
     </div>
 
@@ -346,6 +347,33 @@
           <tbody></tbody>
         </table>
       </div>
+
+      <!-- 🔹 Aba Ternos -->
+      <div id="trios" class="tab-content">
+        <h2>Tabela de Trios (Ternos)</h2>
+
+        <div class="botoes-container">
+          <button class="btn-ternos" data-quantidade="10">10 Concursos</button>
+          <button class="btn-ternos" data-quantidade="20">20 Concursos</button>
+          <button class="btn-ternos" data-quantidade="30">30 Concursos</button>
+        </div>
+
+        <div id="ternos-loading" class="loading" style="display: none">
+          Carregando tabela de trios...
+        </div>
+
+        <table id="ternos-table" style="display: none">
+          <thead>
+            <tr>
+              <th>Ternos</th>
+              <th>Qtd Sorteios</th>
+              <th>Atraso Atual</th>
+              <th>Último Concurso</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </main>
 
     <script>
@@ -366,6 +394,9 @@
       });
     </script>
 
+    <!-- Ordem importa -->
+    <script src="duplas.js"></script>
+    <script src="ternos.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
