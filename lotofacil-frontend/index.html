@@ -107,12 +107,12 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        font-size: 0.9em;
+        font-size: 1em;
       }
 
       #movimentacao-table th,
       #movimentacao-table td {
-        padding: 10px 7px;
+        padding: 7px 7px;
         text-align: center;
       }
 
@@ -232,9 +232,9 @@
       }
 
       .dezena.sorteada {
-        background: #6a5acd;
+        background: #7209b7;
         color: #fff;
-        border-color: #6a5acd;
+        border-color: #7209b7;
       }
 
       /* Estilo para destacar a linha clicada */
@@ -270,6 +270,12 @@
       /* Nova regra para alinhar o conteúdo das células de ID e Data */
       #tabela-movimentacao td:first-child,
       #tabela-movimentacao td:nth-child(2) {
+        text-align: center;
+      }
+
+      .numero-nao-sorteado {
+        background-color: #f0f0f0; /* Cinza claro */
+        color: #333;
         text-align: center;
       }
     </style>

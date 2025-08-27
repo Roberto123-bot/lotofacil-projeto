@@ -96,11 +96,13 @@ dados.concursos.forEach((concurso) => {
   const numerosSorteados = new Set(concurso.numeros);
   for (let i = 1; i <= 25; i++) {
     const cell = row.insertCell(i + 1);
+    const numero = i.toString().padStart(2, "0");
+    cell.textContent = numero;
+
     if (numerosSorteados.has(i)) {
-      cell.textContent = i.toString().padStart(2, "0");
       cell.classList.add("numero-sorteado");
     } else {
-      cell.textContent = "";
+      cell.classList.add("numero-nao-sorteado");
     }
   }
 });
