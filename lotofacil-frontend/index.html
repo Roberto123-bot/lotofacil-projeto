@@ -241,6 +241,37 @@
       .linha-destacada {
         background-color: yellow !important;
       }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .numero-sorteado {
+        background-color: #6200ff; /* Cor para números sorteados */
+        color: white;
+        font-weight: bold;
+      }
+      /* Nova regra para padronizar o tamanho das células dos números */
+      #tabela-movimentacao td:not(:first-child):not(:nth-child(2)) {
+        width: 30px; /* Largura padrão para 2 dígitos */
+        height: 30px; /* Altura padrão */
+        padding: 0;
+        line-height: 30px; /* Alinha o texto verticalmente */
+        font-size: 14px; /* Ajuste o tamanho da fonte se necessário */
+      }
+      /* Nova regra para alinhar o conteúdo das células de ID e Data */
+      #tabela-movimentacao td:first-child,
+      #tabela-movimentacao td:nth-child(2) {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -252,10 +283,10 @@
     <div class="tabs">
       <div class="tab active" data-tab="frequencia">Frequência</div>
       <div class="tab" data-tab="movimentacao">Movimentação</div>
+      <div class="tab" data-tab="independencia">Independência</div>
       <div class="tab" data-tab="ultimo">Último Resultado</div>
       <div class="tab" data-tab="duplas">Duplas</div>
       <div class="tab" data-tab="trios">Trios</div>
-      <!-- ✅ Novo -->
     </div>
 
     <main>
@@ -276,7 +307,7 @@
         </table>
       </div>
 
-      <!-- Aba Movimentação -->
+      <!-- 🔹 Aba Movimentação -->
       <div id="movimentacao" class="tab-content">
         <h2>Tabela de Movimentação</h2>
         <div class="botoes-container">
@@ -297,6 +328,20 @@
           <thead>
             <tr>
               <th class="titulo_conc" style="color: white">Concurso</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- 🔹 Aba Independência -->
+      <div id="independencia" class="tab-content">
+        <h1>Lotofácil da Independência</h1>
+        <table id="tabela-movimentacao">
+          <thead>
+            <tr>
+              <th>CONCURSO</th>
+              <th>Data</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -402,6 +447,7 @@
     <!-- Ordem importa -->
     <script src="duplas.js"></script>
     <script src="ternos.js"></script>
+    <script src="independencia.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
