@@ -302,17 +302,17 @@
 
       .painel {
         display: grid;
-        grid-template-columns: repeat(5, 60px);
-        gap: 10px;
+        grid-template-columns: repeat(5, 40px);
+        gap: 5px;
         margin-top: 15px;
       }
       .num {
-        width: 60px;
-        height: 60px;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid #666;
+        border: 1px solid #666;
         border-radius: 8px;
         background: #fff;
         cursor: pointer;
@@ -320,7 +320,7 @@
         font-weight: bold;
       }
       .num.selecionado {
-        background: #6a1b9a;
+        background: #7209b7;
         color: #fff;
       }
       .resultados {
@@ -334,6 +334,10 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         max-height: 250px;
         overflow-y: auto;
+      }
+      .resultados::-webkit-scrollbar-track {
+        background: #f1f1f1; /* trilho */
+        border-radius: 8px;
       }
       .botoes {
         margin-top: 20px;
