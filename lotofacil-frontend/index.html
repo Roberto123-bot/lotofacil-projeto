@@ -280,8 +280,24 @@
       }
 
       .container {
-        display: flex;
+        flex-direction: column;
         gap: 30px;
+        padding: 30px;
+      }
+
+      @media (min-width: 768px) {
+        .container {
+          flex-direction: row; /* Aligns elements side-by-side */
+        }
+
+        /* Distributes space on larger screens */
+        .container > div:first-child {
+          flex: 2; /* Gives more space to the number panel */
+        }
+
+        .resultados {
+          flex: 1; /* Gives less space to the results panel */
+        }
       }
 
       .painel {
@@ -308,6 +324,7 @@
         color: #fff;
       }
       .resultados {
+        margin-top: 20px;
         flex: 1;
         background: #fff;
         padding: 15px;
