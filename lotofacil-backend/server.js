@@ -5,12 +5,18 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cron from "node-cron";
 import axios from "axios";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// 🛠️ Necessário para trabalhar com __dirname em ESModules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 🔹 Conexão MongoDB
 mongoose.connect(process.env.MONGO_URI);
@@ -143,6 +149,16 @@ app.get("/concursos/ultimo", async (req, res) => {
       .status(500)
       .json({ error: "Erro ao buscar último concurso: " + error.message });
   }
+});
+
+// ================== FRONTEND ==================
+
+// Servir arquivos estáticos do frontend
+app.use(express.static(path.join(__dirname, "lotofacil-frontend")));
+
+// Rota para acessar o frontend (index.html)
+app.get("/lotofacil", (req, res) => {
+  res.sendFile(path.join(__dirname, "lotofacil-frontend", "index.html"));
 });
 
 // 🔹 Cron: rodar automaticamente todo dia às 03h
