@@ -285,21 +285,6 @@
         padding: 30px;
       }
 
-      @media (min-width: 768px) {
-        .container {
-          flex-direction: row; /* Aligns elements side-by-side */
-        }
-
-        /* Distributes space on larger screens */
-        .container > div:first-child {
-          flex: 2; /* Gives more space to the number panel */
-        }
-
-        .resultados {
-          flex: 1; /* Gives less space to the results panel */
-        }
-      }
-
       .painel {
         display: grid;
         grid-template-columns: repeat(5, 40px);
@@ -433,174 +418,328 @@
         border-color: #4caf50; /* Verde igual ao botão "Conferir" */
         box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
       }
+
+      /* Layout geral */
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar normal (desktop) */
+      .sidebar {
+        width: 220px;
+        background: #6c2bb8;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 0;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar .tab {
+        padding: 15px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #fff;
+        transition: background 0.3s;
+      }
+
+      .sidebar .tab:hover {
+        background: #532091;
+      }
+
+      .sidebar .tab.active {
+        background: #fff;
+        color: #6c2bb8;
+        border-left: 5px solid #4caf50;
+      }
+
+      /* Conteúdo */
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #f7f7f7;
+        overflow-y: auto;
+      }
+
+      /* Botão hamburguer */
+      .menu-toggle {
+        display: none;
+        font-size: 26px;
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        position: absolute;
+        top: 12px;
+        left: 15px;
+      }
+
+      /* Overlay escuro */
+      .overlay {
+        display: none; /* escondido por padrão */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 900;
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .overlay {
+          display: none !important; /* nunca aparece no desktop */
+        }
+
+        .layout {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100%;
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+
+        .content {
+          margin-top: 60px;
+        }
+
+        .container {
+          flex-direction: row; /* Aligns elements side-by-side */
+        }
+
+        /* Distributes space on larger screens */
+        .container > div:first-child {
+          flex: 2; /* Gives more space to the number panel */
+        }
+
+        .resultados {
+          flex: 1; /* Gives less space to the results panel */
+        }
+      }
     </style>
   </head>
   <body>
     <header>
       <h1>Análise Lotofácil</h1>
+      <!-- Botão hamburguer só aparece no celular -->
+      <button class="menu-toggle" id="menu-toggle">☰</button>
     </header>
 
-    <!-- Abas -->
-    <div class="tabs">
-      <div class="tab active" data-tab="frequencia">Frequência</div>
-      <div class="tab" data-tab="movimentacao">Movimentação</div>
-      <div class="tab" data-tab="ultimo">Último Resultado</div>
-      <div class="tab" data-tab="duplas">Duplas</div>
-      <div class="tab" data-tab="trios">Trios</div>
-      <div class="tab" data-tab="montar">Montar/Testar</div>
+    <div>
+      <!-- Sidebar -->
+      <nav class="sidebar" id="sidebar">
+        <div class="tab active" data-tab="movimentacao">Movimentação</div>
+        <div class="tab" data-tab="frequencia">Frequência</div>
+        <div class="tab" data-tab="ultimo">Último Resultado</div>
+        <div class="tab" data-tab="duplas">Duplas</div>
+        <div class="tab" data-tab="trios">Trios</div>
+        <div class="tab" data-tab="montar">Montar/Testar</div>
+      </nav>
+
+      <!-- Overlay -->
+      <div class="overlay" id="overlay"></div>
+
+      <main class="content">
+        <!-- Aba Frequência -->
+        <div id="frequencia" class="tab-content">
+          <h2>Tabela de Frequência</h2>
+          <p>Dezenas mais sorteadas em todos os concursos.</p>
+          <div id="loading">Carregando dados...</div>
+          <table id="frequencia-table" style="display: none">
+            <thead>
+              <tr>
+                <th>Posição</th>
+                <th>Dezena</th>
+                <th>Total de Sorteios</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- 🔹 Aba Movimentação -->
+        <div id="movimentacao" class="tab-content active">
+          <h2>Tabela de Movimentação</h2>
+          <div class="botoes-container">
+            <button class="btn-movimentacao" data-quantidade="10">
+              10 Concursos
+            </button>
+            <button class="btn-movimentacao" data-quantidade="20">
+              20 Concursos
+            </button>
+            <button class="btn-movimentacao" data-quantidade="30">
+              30 Concursos
+            </button>
+          </div>
+          <div id="movimentacao-loading" class="loading" style="display: none">
+            Carregando tabela...
+          </div>
+          <table id="movimentacao-table" style="display: none">
+            <thead>
+              <tr>
+                <th class="titulo_conc" style="color: white">Concurso</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- 🔹 Aba Último Concurso -->
+        <div id="ultimo" class="tab-content">
+          <h2>Último Concurso</h2>
+
+          <div id="ultimo-concurso" class="card">
+            <p><strong>Concurso:</strong> <span id="uc-concurso"></span></p>
+            <p><strong>Data:</strong> <span id="uc-data"></span></p>
+
+            <div class="dezenas-container" id="uc-dezenas"></div>
+
+            <div class="valores">
+              <div class="valor-card">
+                <p>Acumulado:</p>
+                <span id="uc-acumulado"></span>
+              </div>
+              <div class="valor-card">
+                <p>Estimativa Próximo:</p>
+                <span id="uc-estimativa"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🔹 Aba Duplas -->
+        <div id="duplas" class="tab-content">
+          <h2>Tabela de Duplas (Duques)</h2>
+
+          <div class="botoes-container">
+            <button class="btn-duplas" data-quantidade="10">
+              10 Concursos
+            </button>
+            <button class="btn-duplas" data-quantidade="20">
+              20 Concursos
+            </button>
+            <button class="btn-duplas" data-quantidade="30">
+              30 Concursos
+            </button>
+          </div>
+
+          <div id="duplas-loading" class="loading" style="display: none">
+            Carregando tabela de duplas...
+          </div>
+
+          <table id="duplas-table" style="display: none">
+            <thead>
+              <tr>
+                <th>Dupla</th>
+                <th>Qtd Sorteios</th>
+                <th>Atraso Atual</th>
+                <th>Último Concurso</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- 🔹 Aba Ternos -->
+        <div id="trios" class="tab-content">
+          <h2>Tabela de Trios (Ternos)</h2>
+
+          <div class="botoes-container">
+            <button class="btn-ternos" data-quantidade="10">
+              10 Concursos
+            </button>
+            <button class="btn-ternos" data-quantidade="20">
+              20 Concursos
+            </button>
+            <button class="btn-ternos" data-quantidade="30">
+              30 Concursos
+            </button>
+          </div>
+
+          <div id="ternos-loading" class="loading" style="display: none">
+            Carregando tabela de trios...
+          </div>
+
+          <table id="ternos-table" style="display: none">
+            <thead>
+              <tr>
+                <th>Ternos</th>
+                <th>Qtd Sorteios</th>
+                <th>Atraso Atual</th>
+                <th>Último Concurso</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- 🔹 Aba Montar/Testar -->
+        <div id="montar" class="tab-content">
+          <h2>Montar Jogo e Testar</h2>
+          <div class="container">
+            <div>
+              <input
+                type="number"
+                id="quantidade-concursos"
+                min="1"
+                max="1"
+                value="1"
+              />
+              <div class="painel" id="painel"></div>
+              <div class="botoes">
+                <button id="conferir">Conferir</button>
+                <button id="limpar">Limpar</button>
+              </div>
+            </div>
+            <div class="resultados" id="resultados">
+              <strong>Resultados aparecerão aqui...</strong>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-
-    <main>
-      <!-- Aba Frequência -->
-      <div id="frequencia" class="tab-content active">
-        <h2>Tabela de Frequência</h2>
-        <p>Dezenas mais sorteadas em todos os concursos.</p>
-        <div id="loading">Carregando dados...</div>
-        <table id="frequencia-table" style="display: none">
-          <thead>
-            <tr>
-              <th>Posição</th>
-              <th>Dezena</th>
-              <th>Total de Sorteios</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- 🔹 Aba Movimentação -->
-      <div id="movimentacao" class="tab-content">
-        <h2>Tabela de Movimentação</h2>
-        <div class="botoes-container">
-          <button class="btn-movimentacao" data-quantidade="10">
-            10 Concursos
-          </button>
-          <button class="btn-movimentacao" data-quantidade="20">
-            20 Concursos
-          </button>
-          <button class="btn-movimentacao" data-quantidade="30">
-            30 Concursos
-          </button>
-        </div>
-        <div id="movimentacao-loading" class="loading" style="display: none">
-          Carregando tabela...
-        </div>
-        <table id="movimentacao-table" style="display: none">
-          <thead>
-            <tr>
-              <th class="titulo_conc" style="color: white">Concurso</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- 🔹 Aba Último Concurso -->
-      <div id="ultimo" class="tab-content">
-        <h2>Último Concurso</h2>
-
-        <div id="ultimo-concurso" class="card">
-          <p><strong>Concurso:</strong> <span id="uc-concurso"></span></p>
-          <p><strong>Data:</strong> <span id="uc-data"></span></p>
-
-          <div class="dezenas-container" id="uc-dezenas"></div>
-
-          <div class="valores">
-            <div class="valor-card">
-              <p>Acumulado:</p>
-              <span id="uc-acumulado"></span>
-            </div>
-            <div class="valor-card">
-              <p>Estimativa Próximo:</p>
-              <span id="uc-estimativa"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🔹 Aba Duplas -->
-      <div id="duplas" class="tab-content">
-        <h2>Tabela de Duplas (Duques)</h2>
-
-        <div class="botoes-container">
-          <button class="btn-duplas" data-quantidade="10">10 Concursos</button>
-          <button class="btn-duplas" data-quantidade="20">20 Concursos</button>
-          <button class="btn-duplas" data-quantidade="30">30 Concursos</button>
-        </div>
-
-        <div id="duplas-loading" class="loading" style="display: none">
-          Carregando tabela de duplas...
-        </div>
-
-        <table id="duplas-table" style="display: none">
-          <thead>
-            <tr>
-              <th>Dupla</th>
-              <th>Qtd Sorteios</th>
-              <th>Atraso Atual</th>
-              <th>Último Concurso</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- 🔹 Aba Ternos -->
-      <div id="trios" class="tab-content">
-        <h2>Tabela de Trios (Ternos)</h2>
-
-        <div class="botoes-container">
-          <button class="btn-ternos" data-quantidade="10">10 Concursos</button>
-          <button class="btn-ternos" data-quantidade="20">20 Concursos</button>
-          <button class="btn-ternos" data-quantidade="30">30 Concursos</button>
-        </div>
-
-        <div id="ternos-loading" class="loading" style="display: none">
-          Carregando tabela de trios...
-        </div>
-
-        <table id="ternos-table" style="display: none">
-          <thead>
-            <tr>
-              <th>Ternos</th>
-              <th>Qtd Sorteios</th>
-              <th>Atraso Atual</th>
-              <th>Último Concurso</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- 🔹 Aba Montar/Testar -->
-      <div id="montar" class="tab-content">
-        <h2>Montar Jogo e Testar</h2>
-        <div class="container">
-          <div>
-            <input
-              type="number"
-              id="quantidade-concursos"
-              min="1"
-              max="1"
-              value="1"
-            />
-            <div class="painel" id="painel"></div>
-            <div class="botoes">
-              <button id="conferir">Conferir</button>
-              <button id="limpar">Limpar</button>
-            </div>
-          </div>
-          <div class="resultados" id="resultados">
-            <strong>Resultados aparecerão aqui...</strong>
-          </div>
-        </div>
-      </div>
-    </main>
 
     <script>
       // Controle de abas
-      const tabs = document.querySelectorAll(".tab");
+
       const contents = document.querySelectorAll(".tab-content");
+
+      // Controle do menu hambúrguer
+      const menuToggle = document.getElementById("menu-toggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+
+      // Abre/fecha o menu pelo botão
+      menuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+        overlay.classList.toggle("show");
+      });
+
+      // Fecha o menu ao clicar no overlay
+      overlay.addEventListener("click", () => {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("show");
+      });
+
+      const tabs = document.querySelectorAll(".tab");
 
       tabs.forEach((tab) => {
         tab.addEventListener("click", () => {
@@ -611,6 +750,10 @@
           // Ativa a aba
           tab.classList.add("active");
           document.getElementById(tab.dataset.tab).classList.add("active");
+
+          // Fecha menu no celular
+          sidebar.classList.remove("open");
+          overlay.classList.remove("show");
         });
       });
     </script>
