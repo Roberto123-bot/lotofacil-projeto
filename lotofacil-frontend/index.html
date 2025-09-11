@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <title>Análise Lotofácil</title>
     <style>
       /* ==== GERAL ==== */
@@ -405,6 +409,161 @@
         border-color: #4caf50;
         box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
       }
+
+      .loterias-alternativa {
+        margin: 20px;
+      }
+
+      .loterias-alternativa h2 {
+        color: #5a2ca0; /* Roxo do layout */
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+      }
+
+      .card h3 {
+        color: #5a2ca0;
+        margin-bottom: 10px;
+      }
+
+      .card p {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 15px;
+      }
+
+      /* BOTOES DOS CARDS */
+
+      .btn-loto {
+        background: #5a2ca0;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-mega {
+        background: #00ff00;
+        color: rgb(0, 0, 0);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-quina {
+        background: #1900ff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-sorte {
+        background: #d9ff00;
+        color: rgb(0, 0, 0);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-mania {
+        background: #ffae00;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-time {
+        background: #fbff00;
+        color: rgb(0, 0, 0);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-dupla {
+        background: #ff0000;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .btn-milionaria {
+        background: #210099;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .social-links {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .social-links a {
+        font-size: 32px;
+        text-decoration: none;
+        transition: transform 0.3s;
+      }
+
+      .social-links a.instagram {
+        color: #e1306c; /* Cor do Instagram */
+      }
+
+      .social-links a.whatsapp {
+        color: #25d366; /* Cor do WhatsApp */
+      }
+
+      .social-links a:hover {
+        transform: scale(1.2);
+      }
     </style>
   </head>
   <body>
@@ -422,6 +581,24 @@
         <div class="tab" data-tab="duplas">Duplas</div>
         <div class="tab" data-tab="trios">Trios</div>
         <div class="tab" data-tab="montar">Montar/Testar</div>
+        <div class="tab" data-tab="alternativa">Loterias Alternativa</div>
+
+        <div class="social-links">
+          <a
+            href="https://www.instagram.com/roberto.loterias/"
+            target="_blank"
+            class="instagram"
+          >
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a
+            href="https://wa.me/5521988957230"
+            target="_blank"
+            class="whatsapp"
+          >
+            <i class="fab fa-whatsapp"></i>
+          </a>
+        </div>
       </nav>
 
       <main class="content">
@@ -563,6 +740,100 @@
             </div>
             <div class="resultados" id="resultados">
               <strong>Resultados aparecerão aqui...</strong>
+            </div>
+          </div>
+        </div>
+
+        <div id="alternativa" class="tab-content">
+          <h2>Loterias Alternativa</h2>
+          <div class="cards-container">
+            <div class="card">
+              <h3>Lotofacil</h3>
+              <p>Monte jogos rápidos e inteligentes</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-loto"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>Mega-Sena</h3>
+              <p>Teste combinações e estratégias</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-mega"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>Quina</h3>
+              <p>Aumente suas chances com esquemas prontos</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-quina"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>Dia de Sorte</h3>
+              <p>Aumente suas chances com esquemas prontos</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-sorte"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>Lotomania</h3>
+              <p>Aumente suas chances com esquemas prontos</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-mania"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>Timemania</h3>
+              <p>Aumente suas chances com esquemas prontos</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-time"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>Dupla Sena</h3>
+              <p>Aumente suas chances com esquemas prontos</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-dupla"
+              >
+                JOGUE AGORA
+              </a>
+            </div>
+            <div class="card">
+              <h3>+ Milionária</h3>
+              <p>Aumente suas chances com esquemas prontos</p>
+              <a
+                href="https://superjogo.loteriabr.com/admin/indicate/2819"
+                target="_blank"
+                class="btn-milionaria"
+              >
+                JOGUE AGORA
+              </a>
             </div>
           </div>
         </div>
