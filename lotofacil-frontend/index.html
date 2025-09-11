@@ -101,27 +101,87 @@
         ); /* Esconde o menu para a esquerda */
       }
 
-      /* Botão de Menu (Hamburguer) */
+      /* Botão do menu */
       .menu-toggle {
-        font-size: 24px;
-        background: var(--cor-principal);
-        border: 1px solid white;
-        color: white;
-        cursor: pointer;
-        position: fixed; /* Fixo na tela */
+        position: absolute;
         top: 15px;
         left: 15px;
-        z-index: 1000;
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
+        background-color: #6a1b9a; /* roxo para combinar */
+        border: none;
         border-radius: 50%;
-        transition: left 0.3s ease, transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
       }
 
-      /* Quando o menu está ABERTO, o botão se move para a direita */
-      .layout:not(.sidebar-fechada) .menu-toggle {
-        left: calc(var(--sidebar-width) + 15px);
-        transform: rotate(90deg); /* Efeito visual opcional */
+      /* Hover */
+      .menu-toggle:hover {
+        background-color: #8e24aa;
+        transform: scale(1.05);
+      }
+
+      /* As 3 barrinhas */
+      .menu-toggle span {
+        position: relative;
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .menu-toggle span::before,
+      .menu-toggle span::after {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .menu-toggle span::before {
+        top: -7px;
+      }
+      .menu-toggle span::after {
+        top: 7px;
+      }
+
+      /* Estado aberto → vira X */
+      .menu-toggle.open span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .menu-toggle.open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .menu-toggle.open span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+      }
+
+      /* Animação de pulso */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .menu-toggle {
+        animation: pulse 2s infinite;
       }
 
       /* ==== ESTILOS DO MENU (Sidebar) ==== */
@@ -428,31 +488,39 @@
 
       .card {
         background: #fff;
-        border-radius: 12px;
+        border-radius: 16px; /* cantos mais arredondados */
         padding: 20px;
         text-align: center;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
       }
 
+      /* Efeito ao passar o mouse */
       .card:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       }
-
+      /* Título da loteria */
       .card h3 {
-        color: #5a2ca0;
+        font-size: 1.2rem;
         margin-bottom: 10px;
+        color: #333;
       }
 
+      /* Texto */
       .card p {
-        font-size: 14px;
+        font-size: 0.95rem;
         color: #555;
         margin-bottom: 15px;
       }
 
       /* BOTOES DOS CARDS */
 
-      .btn-loto {
+      .card .btn-loto {
+        display: inline-block;
+        text-decoration: none;
         background: #5a2ca0;
         color: white;
         border: none;
@@ -460,10 +528,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-mega {
+        display: inline-block;
+        text-decoration: none;
         background: #00ff00;
         color: rgb(0, 0, 0);
         border: none;
@@ -471,10 +541,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-quina {
+        display: inline-block;
+        text-decoration: none;
         background: #1900ff;
         color: white;
         border: none;
@@ -482,10 +554,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-sorte {
+        display: inline-block;
+        text-decoration: none;
         background: #d9ff00;
         color: rgb(0, 0, 0);
         border: none;
@@ -493,10 +567,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-mania {
+        display: inline-block;
+        text-decoration: none;
         background: #ffae00;
         color: white;
         border: none;
@@ -504,10 +580,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-time {
+        display: inline-block;
+        text-decoration: none;
         background: #fbff00;
         color: rgb(0, 0, 0);
         border: none;
@@ -515,10 +593,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-dupla {
+        display: inline-block;
+        text-decoration: none;
         background: #ff0000;
         color: white;
         border: none;
@@ -526,10 +606,12 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .btn-milionaria {
+        display: inline-block;
+        text-decoration: none;
         background: #210099;
         color: white;
         border: none;
@@ -537,7 +619,7 @@
         border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       .social-links {
@@ -567,7 +649,11 @@
     </style>
   </head>
   <body>
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
     <header>
       <h1>Análise Lotofácil</h1>
@@ -850,6 +936,7 @@
         // Abre/fecha o menu pelo botão
         menuToggle.addEventListener("click", () => {
           layout.classList.toggle("sidebar-fechada");
+          menuToggle.classList.toggle("open"); // 👈 ativa/desativa o X
         });
 
         // Lógica para trocar de abas
