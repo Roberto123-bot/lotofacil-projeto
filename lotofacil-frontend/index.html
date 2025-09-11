@@ -4,8 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Análise Lotofácil</title>
-    <link rel="stylesheet" href="styles.css" />
     <style>
+      /* ==== GERAL ==== */
+      :root {
+        --sidebar-width: 220px;
+        --cor-principal: #6c2bb8;
+        --cor-hover: #532091;
+      }
+
       body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -14,39 +20,11 @@
       }
 
       header {
-        background: #6c2bb8;
+        background: var(--cor-principal);
         color: #fff;
         padding: 1rem;
         text-align: center;
-      }
-
-      .tabs {
-        display: flex;
-        background: #ddd;
-      }
-
-      .tab {
-        flex: 1;
-        padding: 1rem;
-        text-align: center;
-        cursor: pointer;
-        font-weight: bold;
-        background: #ccc;
-        transition: background 0.3s;
-      }
-
-      .tab.active {
-        background: #fff;
-        border-bottom: 3px solid #6c2bb8;
-      }
-
-      .tab-content {
-        display: none;
-        padding: 1rem;
-      }
-
-      .tab-content.active {
-        display: block;
+        position: relative; /* Para posicionar o botão dentro */
       }
 
       table {
@@ -55,49 +33,112 @@
         margin-top: 1rem;
         background: #fff;
       }
-
       th,
       td {
         padding: 12px 15px;
         text-align: left;
         border-bottom: 1px solid #ddd;
       }
-
       th {
         background-color: #4caf50;
         color: #fff;
-        text-transform: uppercase;
       }
-
-      tr:nth-child(even) {
-        background-color: #f9f9f9;
+      .tab-content {
+        display: none;
+        padding: 1rem;
       }
-
-      tr:hover {
-        background-color: #f1f1f1;
+      .tab-content.active {
+        display: block;
       }
-
-      td:first-child {
-        font-weight: bold;
-        text-align: center;
-      }
-
       .botoes-container {
         margin: 1rem 0;
         display: flex;
         gap: 10px;
       }
-
       .botoes-container button {
         padding: 0.6rem 1rem;
         border: none;
-        background: #6c2bb8;
+        background: var(--cor-principal);
         color: white;
         cursor: pointer;
         border-radius: 5px;
         transition: background 0.3s;
       }
+      .botoes-container button:hover {
+        background: var(--cor-hover);
+      }
 
+      /* ==== LAYOUT PRINCIPAL (NOVA LÓGICA) ==== */
+      .layout {
+        display: flex;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        background: var(--cor-principal);
+        color: #fff;
+        padding: 20px 0;
+        transition: margin-left 0.3s ease; /* Animação suave */
+        flex-shrink: 0; /* Impede que o sidebar encolha */
+      }
+
+      .content {
+        flex-grow: 1; /* Ocupa o espaço restante */
+        padding: 20px;
+        background: #f7f7f7;
+        transition: margin-left 0.3s ease;
+        position: relative; /* Contexto para o botão */
+      }
+
+      /* ESTADO FECHADO */
+      .layout.sidebar-fechada .sidebar {
+        margin-left: calc(
+          -1 * var(--sidebar-width)
+        ); /* Esconde o menu para a esquerda */
+      }
+
+      /* Botão de Menu (Hamburguer) */
+      .menu-toggle {
+        font-size: 24px;
+        background: var(--cor-principal);
+        border: 1px solid white;
+        color: white;
+        cursor: pointer;
+        position: fixed; /* Fixo na tela */
+        top: 15px;
+        left: 15px;
+        z-index: 1000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        transition: left 0.3s ease, transform 0.3s ease;
+      }
+
+      /* Quando o menu está ABERTO, o botão se move para a direita */
+      .layout:not(.sidebar-fechada) .menu-toggle {
+        left: calc(var(--sidebar-width) + 15px);
+        transform: rotate(90deg); /* Efeito visual opcional */
+      }
+
+      /* ==== ESTILOS DO MENU (Sidebar) ==== */
+      .sidebar .tab {
+        padding: 15px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #fff;
+        transition: background 0.3s;
+        border-left: 5px solid transparent;
+      }
+      .sidebar .tab:hover {
+        background: var(--cor-hover);
+      }
+      .sidebar .tab.active {
+        background: #fff;
+        color: var(--cor-principal);
+        border-left: 5px solid #4caf50;
+      }
+
+      /* Demais estilos do seu projeto (mantidos) */
       .dezena-sorteada {
         background-color: #7209b7;
         color: white;
@@ -109,33 +150,23 @@
         align-items: center;
         font-size: 1em;
       }
-
       #movimentacao-table th,
       #movimentacao-table td {
-        padding: 7px 7px;
+        padding: 7px;
         text-align: center;
       }
-
       #movimentacao-table th:first-child,
       #movimentacao-table td:first-child {
         font-weight: bold;
         color: #4caf50;
       }
-
       .dezena-nao-sorteada {
         color: #bbb;
       }
-
-      .botoes-container button:hover {
-        background: #532091;
-      }
-
       .loading {
         font-weight: bold;
-        color: #6c2bb8;
+        color: var(--cor-principal);
       }
-
-      /* Linha de Sequência - Azul */
       .linha-sequência td:first-child {
         font-weight: bold;
         color: #1565c0;
@@ -143,8 +174,6 @@
       .linha-sequência td {
         background-color: #e3f2fd;
       }
-
-      /* Linha de Atrasos - Vermelho */
       .linha-atrasos td:first-child {
         font-weight: bold;
         color: #c62828;
@@ -152,8 +181,6 @@
       .linha-atrasos td {
         background-color: #ffebee;
       }
-
-      /* Linha de Frequência - Verde */
       .linha-frequência td:first-child {
         font-weight: bold;
         color: #2e7d32;
@@ -161,8 +188,6 @@
       .linha-frequência td {
         background-color: #e8f5e9;
       }
-
-      /* Linha de Temperatura - cinza claro, letras coloridas via JS */
       .linha-temp td:first-child {
         font-weight: bold;
         color: #424242;
@@ -170,17 +195,14 @@
       .linha-temp td {
         background-color: #f5f5f5;
       }
-
-      /* Força os nomes a ficarem pretos */
       tr.linha-sequência td:first-child,
       tr.linha-atrasos td:first-child,
       tr.linha-frequência td:first-child,
       tr.linha-temp td:first-child {
-        color: #000 !important; /* Preto */
-        font-weight: bold; /* Destaque */
-        background: transparent !important; /* Remove fundo colorido */
+        color: #000 !important;
+        font-weight: bold;
+        background: transparent !important;
       }
-
       #ultimo-concurso {
         background: #fff;
         border-radius: 12px;
@@ -188,20 +210,17 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         margin-top: 12px;
       }
-
       .dezenas-container {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         margin: 12px 0;
       }
-
       .valores {
         display: flex;
         gap: 16px;
         margin-top: 12px;
       }
-
       .valor-card {
         flex: 1;
         background: #f5f5f5;
@@ -209,7 +228,6 @@
         border-radius: 8px;
         text-align: center;
       }
-
       #uc-dezenas {
         display: grid;
         grid-template-columns: repeat(5, 50px);
@@ -217,7 +235,6 @@
         margin: 20px auto;
         justify-content: center;
       }
-
       .dezena {
         width: 50px;
         height: 50px;
@@ -230,61 +247,45 @@
         background: #f9f9f9;
         color: #555;
       }
-
       .dezena.sorteada {
         background: #7209b7;
         color: #fff;
         border-color: #7209b7;
       }
-
-      /* Estilo para destacar a linha clicada */
       .linha-destacada {
         background-color: yellow !important;
       }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-
       td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: center;
       }
-
       .numero-sorteado {
-        background-color: #6200ff; /* Cor para números sorteados */
+        background-color: #6200ff;
         color: white;
         font-weight: bold;
       }
-      /* Nova regra para padronizar o tamanho das células dos números */
       #tabela-movimentacao td:not(:first-child):not(:nth-child(2)) {
-        width: 30px; /* Largura padrão para 2 dígitos */
-        height: 30px; /* Altura padrão */
+        width: 30px;
+        height: 30px;
         padding: 0;
-        line-height: 30px; /* Alinha o texto verticalmente */
-        font-size: 14px; /* Ajuste o tamanho da fonte se necessário */
+        line-height: 30px;
+        font-size: 14px;
       }
-      /* Nova regra para alinhar o conteúdo das células de ID e Data */
       #tabela-movimentacao td:first-child,
       #tabela-movimentacao td:nth-child(2) {
         text-align: center;
       }
-
       .numero-nao-sorteado {
-        background-color: #f0f0f0; /* Cinza claro */
+        background-color: #f0f0f0;
         color: #333;
         text-align: center;
       }
-
       .container {
         flex-direction: column;
         gap: 30px;
         padding: 30px;
       }
-
       .painel {
         display: grid;
         grid-template-columns: repeat(5, 40px);
@@ -321,7 +322,7 @@
         overflow-y: auto;
       }
       .resultados::-webkit-scrollbar-track {
-        background: #f1f1f1; /* trilho */
+        background: #f1f1f1;
         border-radius: 8px;
       }
       .botoes {
@@ -343,16 +344,12 @@
         background: #c62828;
         color: #fff;
       }
-
-      /* Estilo base */
       .resultado-item {
         padding: 5px;
         margin: 2px 0;
         border-radius: 5px;
         font-weight: bold;
       }
-
-      /* Estilo base para todas as linhas de resultado */
       .linha-resultado {
         padding: 8px;
         margin-bottom: 5px;
@@ -360,191 +357,64 @@
         font-weight: 500;
         transition: all 0.2s ease-in-out;
       }
-
-      /* Cores para cada pontuação premiada */
       .acertos-11 {
-        background-color: #bbdefb; /* Azul bem claro */
+        background-color: #bbdefb;
         color: #1d2d50;
         border-left: 5px solid #2196f3;
       }
-
       .acertos-12 {
-        background-color: #a5d6a7; /* Verde claro */
+        background-color: #a5d6a7;
         color: #1b5e20;
         border-left: 5px solid #4caf50;
       }
-
       .acertos-13 {
-        background-color: #ffcc80; /* Laranja claro */
+        background-color: #ffcc80;
         color: #4e342e;
         border-left: 5px solid #ff9800;
       }
-
       .acertos-14 {
-        background-color: #ffb74d; /* Laranja mais forte (prêmio alto) */
+        background-color: #ffb74d;
         color: #4e342e;
         font-weight: bold;
         border-left: 5px solid #f57c00;
       }
       .acertos-15 {
-        background-color: #ff4d4d; /* Laranja mais forte (prêmio alto) */
+        background-color: #ff4d4d;
         color: #4e342e;
         font-weight: bold;
         border-left: 5px solid #f50000;
       }
-
       #quantidade-concursos {
         width: 80px;
         padding: 8px 10px;
         font-size: 16px;
         font-weight: bold;
         text-align: center;
-        border: 2px solid #6a1b9a; /* Roxo do seu tema */
+        border: 2px solid #6a1b9a;
         border-radius: 8px;
         outline: none;
         transition: all 0.3s ease;
         background-color: #f9f9f9;
         color: #333;
       }
-
-      /* Quando o usuário passa o mouse */
       #quantidade-concursos:hover {
         border-color: #9c27b0;
         background-color: #fff;
       }
-
-      /* Quando o usuário clica dentro */
       #quantidade-concursos:focus {
-        border-color: #4caf50; /* Verde igual ao botão "Conferir" */
+        border-color: #4caf50;
         box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
-      }
-
-      /* Layout geral */
-      .layout {
-        display: flex;
-        min-height: 100vh;
-      }
-
-      /* Sidebar normal (desktop) */
-      .sidebar {
-        width: 220px;
-        background: #6c2bb8;
-        color: #fff;
-        display: flex;
-        flex-direction: column;
-        padding: 20px 0;
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar .tab {
-        padding: 15px 20px;
-        cursor: pointer;
-        font-weight: bold;
-        color: #fff;
-        transition: background 0.3s;
-      }
-
-      .sidebar .tab:hover {
-        background: #532091;
-      }
-
-      .sidebar .tab.active {
-        background: #fff;
-        color: #6c2bb8;
-        border-left: 5px solid #4caf50;
-      }
-
-      /* Conteúdo */
-      .content {
-        flex: 1;
-        padding: 20px;
-        background: #f7f7f7;
-        overflow-y: auto;
-      }
-
-      /* Botão hamburguer */
-      .menu-toggle {
-        display: none;
-        font-size: 26px;
-        background: transparent;
-        border: none;
-        color: white;
-        cursor: pointer;
-        position: absolute;
-        top: 12px;
-        left: 15px;
-      }
-
-      /* Overlay escuro */
-      .overlay {
-        display: none; /* escondido por padrão */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 900;
-      }
-
-      .overlay.show {
-        display: block;
-      }
-
-      @media (max-width: 768px) {
-        .overlay {
-          display: none !important; /* nunca aparece no desktop */
-        }
-
-        .layout {
-          flex-direction: column;
-        }
-
-        .sidebar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          height: 100%;
-          transform: translateX(-100%);
-          z-index: 1000;
-        }
-
-        .sidebar.open {
-          transform: translateX(0);
-        }
-
-        .menu-toggle {
-          display: block;
-        }
-
-        .content {
-          margin-top: 60px;
-        }
-
-        .container {
-          flex-direction: row; /* Aligns elements side-by-side */
-        }
-
-        /* Distributes space on larger screens */
-        .container > div:first-child {
-          flex: 2; /* Gives more space to the number panel */
-        }
-
-        .resultados {
-          flex: 1; /* Gives less space to the results panel */
-        }
       }
     </style>
   </head>
   <body>
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+
     <header>
       <h1>Análise Lotofácil</h1>
-      <!-- Botão hamburguer só aparece no celular -->
-      <button class="menu-toggle" id="menu-toggle">☰</button>
     </header>
 
-    <div>
-      <!-- Sidebar -->
+    <div class="layout" id="layout">
       <nav class="sidebar" id="sidebar">
         <div class="tab active" data-tab="movimentacao">Movimentação</div>
         <div class="tab" data-tab="frequencia">Frequência</div>
@@ -554,11 +424,7 @@
         <div class="tab" data-tab="montar">Montar/Testar</div>
       </nav>
 
-      <!-- Overlay -->
-      <div class="overlay" id="overlay"></div>
-
       <main class="content">
-        <!-- Aba Frequência -->
         <div id="frequencia" class="tab-content">
           <h2>Tabela de Frequência</h2>
           <p>Dezenas mais sorteadas em todos os concursos.</p>
@@ -575,7 +441,6 @@
           </table>
         </div>
 
-        <!-- 🔹 Aba Movimentação -->
         <div id="movimentacao" class="tab-content active">
           <h2>Tabela de Movimentação</h2>
           <div class="botoes-container">
@@ -602,16 +467,12 @@
           </table>
         </div>
 
-        <!-- 🔹 Aba Último Concurso -->
         <div id="ultimo" class="tab-content">
           <h2>Último Concurso</h2>
-
           <div id="ultimo-concurso" class="card">
             <p><strong>Concurso:</strong> <span id="uc-concurso"></span></p>
             <p><strong>Data:</strong> <span id="uc-data"></span></p>
-
             <div class="dezenas-container" id="uc-dezenas"></div>
-
             <div class="valores">
               <div class="valor-card">
                 <p>Acumulado:</p>
@@ -625,10 +486,8 @@
           </div>
         </div>
 
-        <!-- 🔹 Aba Duplas -->
         <div id="duplas" class="tab-content">
           <h2>Tabela de Duplas (Duques)</h2>
-
           <div class="botoes-container">
             <button class="btn-duplas" data-quantidade="10">
               10 Concursos
@@ -640,11 +499,9 @@
               30 Concursos
             </button>
           </div>
-
           <div id="duplas-loading" class="loading" style="display: none">
             Carregando tabela de duplas...
           </div>
-
           <table id="duplas-table" style="display: none">
             <thead>
               <tr>
@@ -658,10 +515,8 @@
           </table>
         </div>
 
-        <!-- 🔹 Aba Ternos -->
         <div id="trios" class="tab-content">
           <h2>Tabela de Trios (Ternos)</h2>
-
           <div class="botoes-container">
             <button class="btn-ternos" data-quantidade="10">
               10 Concursos
@@ -673,11 +528,9 @@
               30 Concursos
             </button>
           </div>
-
           <div id="ternos-loading" class="loading" style="display: none">
             Carregando tabela de trios...
           </div>
-
           <table id="ternos-table" style="display: none">
             <thead>
               <tr>
@@ -691,7 +544,6 @@
           </table>
         </div>
 
-        <!-- 🔹 Aba Montar/Testar -->
         <div id="montar" class="tab-content">
           <h2>Montar Jogo e Testar</h2>
           <div class="container">
@@ -718,47 +570,37 @@
     </div>
 
     <script>
-      // Controle de abas
+      document.addEventListener("DOMContentLoaded", function () {
+        const layout = document.getElementById("layout");
+        const menuToggle = document.getElementById("menu-toggle");
+        const tabs = document.querySelectorAll(".tab");
+        const contents = document.querySelectorAll(".tab-content");
 
-      const contents = document.querySelectorAll(".tab-content");
+        // Abre/fecha o menu pelo botão
+        menuToggle.addEventListener("click", () => {
+          layout.classList.toggle("sidebar-fechada");
+        });
 
-      // Controle do menu hambúrguer
-      const menuToggle = document.getElementById("menu-toggle");
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("overlay");
+        // Lógica para trocar de abas
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            // Remove a classe 'active' de todas as abas e conteúdos
+            tabs.forEach((t) => t.classList.remove("active"));
+            contents.forEach((c) => c.classList.remove("active"));
 
-      // Abre/fecha o menu pelo botão
-      menuToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("open");
-        overlay.classList.toggle("show");
-      });
+            // Adiciona a classe 'active' na aba e conteúdo clicados
+            tab.classList.add("active");
+            document.getElementById(tab.dataset.tab).classList.add("active");
 
-      // Fecha o menu ao clicar no overlay
-      overlay.addEventListener("click", () => {
-        sidebar.classList.remove("open");
-        overlay.classList.remove("show");
-      });
-
-      const tabs = document.querySelectorAll(".tab");
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          // Remove active
-          tabs.forEach((t) => t.classList.remove("active"));
-          contents.forEach((c) => c.classList.remove("active"));
-
-          // Ativa a aba
-          tab.classList.add("active");
-          document.getElementById(tab.dataset.tab).classList.add("active");
-
-          // Fecha menu no celular
-          sidebar.classList.remove("open");
-          overlay.classList.remove("show");
+            // Opcional: Fecha o menu ao escolher uma opção em telas pequenas
+            if (window.innerWidth <= 768) {
+              layout.classList.add("sidebar-fechada");
+            }
+          });
         });
       });
     </script>
 
-    <!-- Ordem importa -->
     <script src="script.js"></script>
     <script src="duplas.js"></script>
     <script src="ternos.js"></script>
