@@ -490,8 +490,9 @@
         gap: 20px;
       }
 
-      /* Lotofácil → Roxo/rosa */
-      .card-loto {
+      /* ===== ESTILO BASE DOS CARDS ===== */
+      .card {
+        position: relative;
         border-radius: 18px;
         padding: 20px;
         color: #fff;
@@ -499,90 +500,72 @@
         font-family: "Poppins", sans-serif;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+      }
+
+      /* Efeito hover */
+      .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      /* ===== FITA DOURADA ===== */
+      .card::before {
+        content: "★ Sorte!";
+        position: absolute;
+        top: 20px;
+        right: -45px;
+        background: linear-gradient(45deg, #ffd700, #ffb700);
+        color: #fff;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 5px 55px;
+        text-align: center;
+        transform: rotate(45deg);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        letter-spacing: 1px;
+      }
+
+      /* ===== CORES POR LOTERIA ===== */
+
+      /* Lotofácil → Roxo/rosa */
+      .card-loto {
         background: linear-gradient(135deg, #8e2de2, #ff0080);
       }
 
       /* Mega-Sena → Verde/azul */
       .card-mega {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #11998e, #38ef7d);
       }
 
       /* Quina → Azul escuro/roxo */
       .card-quina {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #2b5876, #4e4376);
       }
 
-      /* Quina → Azul escuro/roxo */
+      /* Dia de Sorte → Verde limão */
       .card-sorte {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #98ad3b, #99cc32);
       }
 
       /* Lotomania → Laranja/vermelho */
       .card-lotomania {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #f7971e, #ff512f);
       }
 
       /* Timemania → Verde/amarelo */
       .card-timemania {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #d9d919, #ffff00);
+        color: #333; /* contraste melhor no amarelo */
       }
 
       /* Dupla Sena → Vermelho/rosa */
       .card-dupla {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #ff416c, #ff4b2b);
       }
 
-      /* Dupla Sena → Vermelho/rosa */
+      /* +Milionária → Azul escuro */
       .card-milionario {
-        border-radius: 18px;
-        padding: 20px;
-        color: #fff;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: linear-gradient(135deg, #3e41ff, #001381);
       }
 
@@ -943,7 +926,7 @@
         <div id="alternativa" class="tab-content">
           <h2>Loterias Alternativa</h2>
           <div class="cards-container">
-            <div class="card-loto">
+            <div class="card card-loto">
               <h3>Lotofacil</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -954,7 +937,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-mega">
+
+            <div class="card card-mega">
               <h3>Mega-Sena</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -965,7 +949,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-quina">
+
+            <div class="card card-quina">
               <h3>Quina</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -976,7 +961,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-sorte">
+
+            <div class="card card-sorte">
               <h3>Dia de Sorte</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -987,7 +973,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-lotomania">
+
+            <div class="card card-lotomania">
               <h3>Lotomania</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -998,7 +985,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-timemania">
+
+            <div class="card card-timemania">
               <h3>Timemania</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -1009,7 +997,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-dupla">
+
+            <div class="card card-dupla">
               <h3>Dupla Sena</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
@@ -1020,7 +1009,8 @@
                 JOGUE AGORA
               </a>
             </div>
-            <div class="card-milionario">
+
+            <div class="card card-milionario">
               <h3>+ Milionária</h3>
               <p>Aumente suas chances com esquemas prontos</p>
               <a
