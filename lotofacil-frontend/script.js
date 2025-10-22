@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
       data.forEach((item, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.dezena}</td>
-                    <td>${item.total}</td>
-                `;
+                      <td>${index + 1}</td>
+                      <td>${item.dezena}</td>
+                      <td>${item.total}</td>
+                  `;
         tableBodyFrequencia.appendChild(row);
       });
     })
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Erro ao carregar dados de frequência.";
     });
 
-  // -------- NOVO CÓDIGO PARA A TABELA DE MOVIMENTAÇÃO --------
+  // -------- TABELA DE MOVIMENTAÇÃO --------
 
   const tableMovimentacao = document.getElementById("movimentacao-table");
   const tableMovimentacaoBody = document.querySelector(
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Função para calcular estatísticas
+  // Função para calcular estatísticas (já estava global, ótimo!)
   function calcularEstatisticas(concursos) {
     const frequencia = Array(26).fill(0);
     const atrasos = Array(26).fill(0);
@@ -104,6 +104,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     return { frequencia, atrasos, sequencia, temperatura };
+  }
+
+  // --- ALTERAÇÃO 1: Mover addLinha para fora e adicionar 'tbody' como argumento ---
+  // Esta função agora é reutilizável por qualquer tabela
+  function addLinha(tbody, titulo, valores) {
+    const row = document.createElement("tr");
+    row.classList.add(`linha-${titulo.toLowerCase().replace(".", "")}`); // adiciona classe baseada no título
+    const cellTitulo = document.createElement("td");
+    cellTitulo.textContent = titulo;
+    row.appendChild(cellTitulo);
+
+    for (let i = 1; i <= 25; i++) {
+      const td = document.createElement("td");
+      td.textContent = valores[i];
+
+      // Para temperatura, colore letras Q, F, M
+      if (titulo.startsWith("Temp")) {
+        if (valores[i] === "Q") td.style.color = "red";
+        if (valores[i] === "F") td.style.color = "blue";
+        if (valores[i] === "M") td.style.color = "green";
+        td.style.fontWeight = "bold";
+      }
+
+      row.appendChild(td);
+    }
+    tbody.appendChild(row); // Adiciona a linha ao 'tbody' correto
   }
 
   // Função para buscar e renderizar a tabela de movimentação
@@ -159,35 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const { frequencia, atrasos, sequencia, temperatura } =
           calcularEstatisticas(data);
 
-        // Renderiza linhas extras
-        function addLinha(titulo, valores) {
-          const row = document.createElement("tr");
-          row.classList.add(`linha-${titulo.toLowerCase().replace(".", "")}`); // adiciona classe baseada no título
-          const cellTitulo = document.createElement("td");
-          cellTitulo.textContent = titulo;
-          row.appendChild(cellTitulo);
-
-          for (let i = 1; i <= 25; i++) {
-            const td = document.createElement("td");
-            td.textContent = valores[i];
-
-            // Para temperatura, colore letras Q, F, M
-            if (titulo.startsWith("Temp")) {
-              if (valores[i] === "Q") td.style.color = "red";
-              if (valores[i] === "F") td.style.color = "blue";
-              if (valores[i] === "M") td.style.color = "green";
-              td.style.fontWeight = "bold";
-            }
-
-            row.appendChild(td);
-          }
-          tableMovimentacaoBody.appendChild(row);
-        }
-
-        addLinha("Sequência", sequencia);
-        addLinha("Atrasos", atrasos);
-        addLinha("Frequência", frequencia);
-        addLinha("Temp.", temperatura);
+        // --- ALTERAÇÃO 2: Atualizar a chamada para 'addLinha' ---
+        // Agora passamos 'tableMovimentacaoBody' como o primeiro argumento
+        addLinha(tableMovimentacaoBody, "Sequência", sequencia);
+        addLinha(tableMovimentacaoBody, "Atrasos", atrasos);
+        addLinha(tableMovimentacaoBody, "Frequência", frequencia);
+        addLinha(tableMovimentacaoBody, "Temp.", temperatura);
       })
       .catch((error) => {
         console.error(
@@ -202,6 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Carregar a tabela de 10 concursos por padrão
   fetchMovimentacao(10);
 
+  // ... (código do carregarUltimoConcurso não mudou, omitido por brevidade) ...
   async function carregarUltimoConcurso() {
     const resp = await fetch(
       "https://lotofacil-projeto.onrender.com/concursos/ultimo"
@@ -241,4 +245,180 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   carregarUltimoConcurso();
+
+  // -------- NOVO CÓDIGO PARA A TABELA DAS CORES --------
+
+  const tableCores = document.getElementById("cores-table");
+  const tableCoresBody = document.querySelector("#cores-table tbody");
+  const tableCoresHeader = document.querySelector("#cores-table thead tr");
+  const loadingCores = document.getElementById("cores-loading");
+
+  // Mapeamento das cores por dezena
+  const mapaCores = {
+    1: "vermelho",
+    11: "vermelho",
+    21: "vermelho",
+    2: "amarelo",
+    12: "amarelo",
+    22: "amarelo",
+    3: "verde",
+    13: "verde",
+    23: "verde",
+    4: "marrom",
+    14: "marrom",
+    24: "marrom",
+    5: "azul",
+    15: "azul",
+    25: "azul",
+    6: "rosa",
+    16: "rosa",
+    7: "preto",
+    17: "preto",
+    8: "cinza",
+    18: "cinza",
+    9: "laranja",
+    19: "laranja",
+    10: "branco",
+    20: "branco",
+  };
+
+  // Cria as colunas para as dezenas de 1 a 25 no cabeçalho da tabela
+  for (let i = 1; i <= 25; i++) {
+    const th = document.createElement("th");
+    th.textContent = i.toString().padStart(2, "0");
+    tableCoresHeader.appendChild(th);
+  }
+
+  // Event listeners nos botões
+  document.querySelectorAll(".btn-cores").forEach((button) => {
+    button.addEventListener("click", () => {
+      const quantidade = button.dataset.quantidade;
+      fetchCores(quantidade);
+    });
+  });
+
+  // Função para buscar e renderizar a tabela de cores
+  function fetchCores(quantidade) {
+    loadingCores.style.display = "block";
+    tableCores.style.display = "none";
+    tableCoresBody.innerHTML = "";
+
+    const API_URL_CORES = `https://lotofacil-projeto.onrender.com/concursos/ultimos/${quantidade}`;
+
+    fetch(API_URL_CORES)
+      .then((response) => {
+        if (!response.ok)
+          throw new Error("Erro ao buscar dados da tabela de cores.");
+        return response.json();
+      })
+      .then((data) => {
+        loadingCores.style.display = "none";
+        tableCores.style.display = "table";
+
+        // Renderiza concursos
+        data.forEach((concurso) => {
+          const row = document.createElement("tr");
+          const cellConcurso = document.createElement("td");
+          cellConcurso.textContent = concurso.concurso;
+          row.appendChild(cellConcurso);
+
+          for (let i = 1; i <= 25; i++) {
+            const cell = document.createElement("td");
+            const span = document.createElement("span");
+            const numeroFormatado = i.toString().padStart(2, "0");
+            span.textContent = numeroFormatado;
+
+            // Define a cor conforme o mapeamento
+            const cor = mapaCores[i];
+            if (concurso.dezenas.includes(numeroFormatado)) {
+              span.classList.add("cor-sorteada", `cor-${cor}`);
+            } else {
+              span.classList.add("cor-nao-sorteada");
+            }
+
+            cell.appendChild(span);
+            row.appendChild(cell);
+          }
+
+          // Permite destacar linhas
+          row.addEventListener("click", () => {
+            row.classList.toggle("linha-destacada");
+          });
+
+          tableCoresBody.appendChild(row);
+        });
+
+        // --- ALTERAÇÃO 3: Adicionar o cálculo e renderização do rodapé ---
+        // Exatamente como foi feito na 'fetchMovimentacao'
+
+        // Calcula estatísticas
+        const { frequencia, atrasos, sequencia, temperatura } =
+          calcularEstatisticas(data);
+
+        // Renderiza linhas extras
+        addLinha(tableCoresBody, "Sequência", sequencia);
+        addLinha(tableCoresBody, "Atrasos", atrasos);
+        addLinha(tableCoresBody, "Frequência", frequencia);
+        addLinha(tableCoresBody, "Temp.", temperatura);
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar tabela de cores:", error);
+        loadingCores.textContent = "Erro ao carregar tabela de cores.";
+      });
+  }
+
+  // Carregar a tabela de 10 concursos por padrão
+  fetchCores(10);
+
+  /**
+   * Melhora 4: Interatividade (Highlight de Coluna)
+   * Versão atualizada com multi-select e toggle.
+   */
+  function setupColumnHighlighting(tableSelector) {
+    const table = document.querySelector(tableSelector);
+    if (!table) return;
+
+    const headers = table.querySelectorAll("thead th");
+
+    headers.forEach((th, index) => {
+      // Pula a primeira coluna "Concurso"
+      if (index === 0) return;
+
+      // 1. Adiciona um listener de clique a cada cabeçalho
+      th.addEventListener("click", () => {
+        // 2. Verifica se a coluna (o próprio th) já está destacada
+        const isHighlighted = th.classList.contains("coluna-destacada");
+
+        // 3. Pega todas as células daquela coluna no body
+        const allRows = table.querySelectorAll("tbody tr");
+
+        // 4. Lógica de TOGLE (marcar/desmarcar)
+        if (isHighlighted) {
+          // Se já está marcada, remove a classe do header...
+          th.classList.remove("coluna-destacada");
+          // ...e de todas as células da coluna
+          allRows.forEach((row) => {
+            const cell = row.querySelector(`td:nth-child(${index + 1})`);
+            if (cell) {
+              cell.classList.remove("coluna-destacada");
+            }
+          });
+        } else {
+          // Se não está marcada, adiciona a classe no header...
+          th.classList.add("coluna-destacada");
+          // ...e em todas as células da coluna
+          allRows.forEach((row) => {
+            const cell = row.querySelector(`td:nth-child(${index + 1})`);
+            if (cell) {
+              cell.classList.add("coluna-destacada");
+            }
+          });
+        }
+      });
+    });
+  }
+
+  // Chame a função para suas duas tabelas
+  setupColumnHighlighting("#movimentacao-table");
+  setupColumnHighlighting("#cores-table");
 });

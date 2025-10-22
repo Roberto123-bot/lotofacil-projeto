@@ -223,10 +223,13 @@
         padding: 7px;
         text-align: center;
       }
-      #movimentacao-table th:first-child,
-      #movimentacao-table td:first-child {
+      #movimentacao-table th:first-child {
         font-weight: bold;
         color: #4caf50;
+      }
+
+      #movimentacao-table td:first-child {
+        font-weight: bold;
       }
       .dezena-nao-sorteada {
         color: #bbb;
@@ -262,14 +265,6 @@
       }
       .linha-temp td {
         background-color: #f5f5f5;
-      }
-      tr.linha-sequência td:first-child,
-      tr.linha-atrasos td:first-child,
-      tr.linha-frequência td:first-child,
-      tr.linha-temp td:first-child {
-        color: #000 !important;
-        font-weight: bold;
-        background: transparent !important;
       }
       #ultimo-concurso {
         background: #fff;
@@ -321,7 +316,7 @@
         border-color: #7209b7;
       }
       .linha-destacada {
-        background-color: yellow !important;
+        background-color: #fff9c4 !important;
       }
       td {
         border: 1px solid #ddd;
@@ -725,6 +720,156 @@
       .social-links a:hover {
         transform: scale(1.2);
       }
+
+      #cores-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      #cores-table th {
+        background: #4caf50;
+        color: #fff;
+      }
+
+      #cores-table th,
+      #cores-table td {
+        padding: 7px;
+        text-align: center;
+      }
+
+      /* SUBSTITUA PELOS DOIS BLOCOS ABAIXO: */
+
+      /* 1. Estilo aplicado a TODAS as células da tabela de cores (incluindo rodapé) */
+      #cores-table td {
+        border: 1px solid #ddd;
+        padding: 7px;
+        font-weight: bold;
+      }
+
+      /* 2. Aplica o tamanho fixo APENAS às linhas de dados (e NÃO ao rodapé) */
+      #cores-table
+        tbody
+        tr:not(.linha-sequência):not(.linha-atrasos):not(.linha-frequência):not(
+          .linha-temp
+        )
+        td {
+        width: 25px;
+        height: 25px;
+      }
+
+      .botoes-cores {
+        margin-bottom: 10px;
+      }
+
+      .botoes-cores button {
+        padding: 0.6rem 1rem;
+        border: none;
+        background: var(--cor-principal);
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background 0.3s;
+      }
+      .botoes-cores button:hover {
+        background: #532091;
+      }
+
+      /* Cores das dezenas */
+      .cor-vermelho {
+        background-color: #ff1900;
+        color: white;
+      }
+      .cor-amarelo {
+        background-color: #ffff00;
+        color: black;
+      }
+      .cor-verde {
+        background-color: #1eff01;
+        color: rgb(0, 0, 0);
+      }
+      .cor-marrom {
+        background-color: #6c3f1b;
+        color: white;
+      }
+      .cor-azul {
+        background-color: #0015ff;
+        color: white;
+      }
+      .cor-rosa {
+        background-color: #ff0180;
+        color: white;
+      }
+      .cor-preto {
+        background-color: #000000;
+        color: white;
+      }
+      .cor-cinza {
+        background-color: #7f8c8d;
+        color: white;
+      }
+      .cor-laranja {
+        background-color: #ff7700;
+        color: white;
+      }
+      .cor-branco {
+        background-color: #89e7ff;
+        color: black;
+      }
+
+      .cor-sorteada {
+        border-radius: 10%;
+        width: 25px;
+        height: 25px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+      }
+
+      .cor-nao-sorteada {
+        color: #bbb;
+      }
+
+      .linha-destacada {
+        background-color: rgba(255, 255, 0, 0.2);
+      }
+
+      /* Em vez de apenas 'color: #bbb;' */
+      .dezena-nao-sorteada,
+      .cor-nao-sorteada {
+        background-color: #f0f0f0; /* Um cinza bem claro */
+        color: #a0a0a0; /* Um cinza um pouco mais escuro para o texto */
+        border-radius: 10%; /* Para combinar com o estilo dos sorteados */
+        width: 25px;
+        height: 25px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px; /* Padronizando o tamanho que discutimos */
+      }
+
+      /* 1. Estilo da coluna destacada (aplica-se ao TH e aos TDs) */
+      .coluna-destacada {
+        background-color: #fff9c4 !important; /* Um amarelo-claro para destaque */
+        /* O !important ajuda a sobrescrever outros estilos de fundo */
+      }
+
+      /* 2. Feedback visual para os cabeçalhos das tabelas (exceto o "Concurso") */
+      #movimentacao-table thead th:not(:first-child),
+      #cores-table thead th:not(:first-child) {
+        cursor: pointer; /* Muda o cursor para "mãozinha" */
+        transition: background-color 0.2s ease;
+      }
+
+      /* Efeito hover para os cabeçalhos */
+      #movimentacao-table thead th:not(:first-child):hover,
+      #cores-table thead th:not(:first-child):hover {
+        /* Usa a variável --cor-hover que você já definiu no seu CSS! */
+        background-color: var(--cor-hover);
+      }
     </style>
   </head>
   <body>
@@ -742,6 +887,9 @@
       <nav class="sidebar" id="sidebar">
         <div class="tab active" data-tab="movimentacao">
           <i class="bi bi-suit-club-fill"></i> Movimentação
+        </div>
+        <div class="tab" data-tab="cores">
+          <i class="bi bi-suit-club-fill"></i> Tabela das Cores
         </div>
         <div class="tab" data-tab="frequencia">
           <i class="bi bi-suit-club-fill"></i> Frequência
@@ -817,6 +965,29 @@
             <thead>
               <tr>
                 <th class="titulo_conc" style="color: white">Concurso</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- TABELA DAS CORES -->
+
+        <div id="cores" class="tab-content">
+          <h2>Tabela de Movimentação por Cores</h2>
+
+          <div class="botoes-cores">
+            <button class="btn-cores" data-quantidade="10">10 Concursos</button>
+            <button class="btn-cores" data-quantidade="20">20 Concursos</button>
+            <button class="btn-cores" data-quantidade="30">30 Concursos</button>
+          </div>
+
+          <div id="cores-loading" style="display: none">Carregando...</div>
+
+          <table id="cores-table">
+            <thead>
+              <tr>
+                <th>Concurso</th>
               </tr>
             </thead>
             <tbody></tbody>
